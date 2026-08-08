@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "pretypecheck": "next typegen",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "gen:api-types": "openapi-typescript ${BACK_OPENAPI_SOURCE:-../Back/openapi.json} -o src/lib/api-types.ts"
