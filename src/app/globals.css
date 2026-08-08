@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * Tokens de design PlayCK — copiados localmente deste repositório
+ * (fonte de verdade: DESIGN.md, raiz do projeto; ADR-001, sem pacote
+ * compartilhado). Tema claro único no MVP (escuro é gap não confirmado —
+ * DESIGN.md, seção Temas).
+ */
+:root {
+  /* Tokens PlayCK (nomes de DESIGN.md) */
+  --color-primary: #2f6b3a;
+  --color-primary-hover: #234f2b;
+  --color-accent: #8fbf3f;
+  --color-surface: #ffffff;
+  --color-background: #f7f6f1;
+  --color-text-primary: #12140f;
+  --color-text-secondary: #5b6058;
+  --color-error: #c6423a;
+  --color-success: #2f6b3a;
+  --color-warning: #b8862e;
+  --color-border: #e4e1d6;
+
+  --radius: 8px;
+  --radius-hero: 16px;
+
+  --shadow-low: 0 1px 2px rgba(15, 18, 15, 0.06);
+  --shadow-elevated: 0 8px 24px rgba(15, 18, 15, 0.12);
+
+  /* Tokens semânticos do shadcn/ui, mapeados para os tokens PlayCK acima —
+     nunca uma cor nova aqui, só remapeamento (regra de DESIGN.md). */
+  --background: var(--color-background);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-surface);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-primary);
+  --primary-foreground: var(--color-background);
+  --secondary: var(--color-accent);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: #ece9de;
+  --muted-foreground: var(--color-text-secondary);
+  --accent: var(--color-accent);
+  --accent-foreground: var(--color-text-primary);
+  --destructive: var(--color-error);
+  --border: var(--color-border);
+  --input: var(--color-border);
+  --ring: var(--color-primary);
+}
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-accent: var(--color-accent);
+  --color-surface: var(--color-surface);
+  --color-background: var(--color-background);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-error: var(--color-error);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+
+  --radius-hero: var(--radius-hero);
+  --shadow-low: var(--shadow-low);
+  --shadow-elevated: var(--shadow-elevated);
+
+  --font-sans: var(--font-inter);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
