@@ -1,5 +1,9 @@
 import type { components } from "./api-types";
-import { getAccessToken } from "./auth-storage";
+import {
+  clearAccessToken,
+  getAccessToken,
+  saveAccessToken,
+} from "./auth-storage";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -63,16 +67,94 @@ async function parseErrorMessage(res: Response, fallback: string): Promise<strin
     : fallback;
 }
 
-async function authFetch(path: string, init: RequestInit = {}): Promise<Response> {
+/**
+ * Renova o access token usando o refresh token do cookie httpOnly.
+ *
+ * O backend implementa rotação de refresh desde a SPEC-001 (REQ-003), mas
+ * nenhum frontend chamava esta rota: o access token vale 15 minutos, e
+ * qualquer ação depois disso morria com "Unauthorized" no meio da tela.
+ * Passava despercebido porque, em teste, o intervalo entre logar e agir
+ * era sempre menor que 15 minutos.
+ *
+ * `credentials: "include"` é obrigatório — é o que manda o cookie de
+ * refresh (httpOnly, `SameSite=Strict`, path `/api/v1/auth`).
+ */
+let renovacaoEmCurso: Promise<boolean> | null = null;
+
+async function renovarSessao(): Promise<boolean> {
+  // Várias requisições podem receber 401 ao mesmo tempo (uma tela que
+  // carrega três listas, por exemplo). Sem esta trava, cada uma dispararia
+  // um refresh, e a rotação do backend trataria as concorrentes como reuso
+  // de token — revogando a sessão inteira, que é o oposto do desejado.
+  if (renovacaoEmCurso) return renovacaoEmCurso;
+
+  renovacaoEmCurso = (async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!res.ok) return false;
+      const { accessToken } = (await res.json()) as { accessToken: string };
+      saveAccessToken(accessToken);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      renovacaoEmCurso = null;
+    }
+  })();
+
+  return renovacaoEmCurso;
+}
+
+function encerrarSessao(): void {
+  clearAccessToken();
+  if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+    // Navegação dura de propósito, em vez de `router.push`: este módulo não
+    // é componente (não há hook disponível) e, mais importante, sessão
+    // perdida deve descartar todo o estado em memória — cache de listas,
+    // formulário pela metade, dados de outro usuário.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = "/login";
+  }
+}
+
+async function requisicaoAutenticada(
+  path: string,
+  init: RequestInit,
+): Promise<Response> {
   const accessToken = getAccessToken();
-  const res = await fetch(`${API_URL}/api/v1${path}`, {
+  return fetch(`${API_URL}/api/v1${path}`, {
     ...init,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...init.headers,
     },
   });
+}
+
+async function authFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  let res = await requisicaoAutenticada(path, init);
+
+  // 401 aqui quase sempre é access token vencido, não credencial errada:
+  // tenta renovar uma vez e repete. Se a renovação falhar, a sessão acabou
+  // de verdade — manda para o login em vez de mostrar "Unauthorized" no
+  // meio de um formulário.
+  if (res.status === 401) {
+    const renovou = await renovarSessao();
+    if (!renovou) {
+      encerrarSessao();
+      throw new ApiError(401, "Sua sessão expirou. Entre novamente.");
+    }
+    res = await requisicaoAutenticada(path, init);
+    if (res.status === 401) {
+      encerrarSessao();
+      throw new ApiError(401, "Sua sessão expirou. Entre novamente.");
+    }
+  }
 
   if (!res.ok) {
     throw new ApiError(res.status, await parseErrorMessage(res, "Não foi possível completar a operação"));
