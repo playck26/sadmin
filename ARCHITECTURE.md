@@ -50,7 +50,7 @@ page.tsx (server component, fino)
 | Rota | Papel |
 |---|---|
 | `/login` | entrada (`super_admin`) |
-| `/empresas` (+ `nova`, `[id]`) | lista, criação e edição de tenants |
+| `/empresas` (+ `nova`, `[id]`) | lista, criação e edição de tenants. **SPEC-016:** `[id]` traz o card `company-admins-card` — lista os gestores e gera senha temporária para quem perdeu o acesso, exibida **uma vez só** |
 
 ## 4. Estado
 

@@ -372,6 +372,38 @@ export interface paths {
         patch: operations["CompaniesController_update"];
         trace?: never;
     };
+    "/api/v1/companies/{id}/admins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CompaniesController_listAdmins"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/companies/{id}/admins/{usuarioId}/senha-temporaria": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CompaniesController_gerarSenhaDeAdmin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/companies/{id}/status": {
         parameters: {
             query?: never;
@@ -402,6 +434,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/company": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeCompanyController_minhaEmpresa"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["MeCompanyController_definirAutoCadastro"];
         trace?: never;
     };
     "/api/v1/courts": {
@@ -843,6 +891,10 @@ export interface components {
         UpdateCompanyStatusDto: {
             /** @enum {string} */
             status: "ativa" | "inativa";
+        };
+        UpdateAutoCadastroDto: {
+            /** @description Liga ou desliga o link público de auto-cadastro de alunos desta empresa. */
+            permiteAutoCadastro: boolean;
         };
         CreateCourtDto: {
             nome: string;
@@ -1562,6 +1614,45 @@ export interface operations {
             };
         };
     };
+    CompaniesController_listAdmins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    CompaniesController_gerarSenhaDeAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                usuarioId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     CompaniesController_updateStatus: {
         parameters: {
             query?: never;
@@ -1595,6 +1686,44 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeCompanyController_minhaEmpresa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeCompanyController_definirAutoCadastro: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAutoCadastroDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {

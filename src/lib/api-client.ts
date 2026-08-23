@@ -236,6 +236,39 @@ export async function updateCompany(id: string, dto: UpdateCompanyDto): Promise<
   return (await res.json()) as Empresa;
 }
 
+/** SPEC-016/AC-001 — os gestores da empresa. */
+export interface AdminDaEmpresa {
+  id: string;
+  nome: string;
+  email: string;
+  status: "ativo" | "inativo";
+  senhaTemporaria: boolean;
+}
+
+export interface SenhaTemporariaGerada {
+  usuario: { id: string; nome: string; email: string };
+  senhaTemporaria: string;
+  expiraEm: string;
+  /** AC-007 — a senha não funciona enquanto a empresa estiver inativa. */
+  empresaInativa: boolean;
+}
+
+export async function listCompanyAdmins(id: string): Promise<AdminDaEmpresa[]> {
+  const res = await authFetch(`/companies/${id}/admins`);
+  return (await res.json()) as AdminDaEmpresa[];
+}
+
+export async function gerarSenhaDeAdmin(
+  companyId: string,
+  usuarioId: string,
+): Promise<SenhaTemporariaGerada> {
+  const res = await authFetch(
+    `/companies/${companyId}/admins/${usuarioId}/senha-temporaria`,
+    { method: "POST" },
+  );
+  return (await res.json()) as SenhaTemporariaGerada;
+}
+
 export async function updateCompanyStatus(id: string, status: CompanyStatus): Promise<Empresa> {
   const res = await authFetch(`/companies/${id}/status`, {
     method: "PATCH",
