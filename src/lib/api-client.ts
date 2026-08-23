@@ -120,6 +120,20 @@ function encerrarSessao(): void {
   }
 }
 
+async function temCodigo(res: Response, codigo: string): Promise<boolean> {
+  try {
+    const body: unknown = await res.json();
+    return (
+      typeof body === "object" &&
+      body !== null &&
+      "code" in body &&
+      (body as { code?: string }).code === codigo
+    );
+  } catch {
+    return false;
+  }
+}
+
 async function requisicaoAutenticada(
   path: string,
   init: RequestInit,
@@ -143,6 +157,19 @@ async function authFetch(path: string, init: RequestInit = {}): Promise<Response
   // tenta renovar uma vez e repete. Se a renovação falhar, a sessão acabou
   // de verdade — manda para o login em vez de mostrar "Unauthorized" no
   // meio de um formulário.
+  // SPEC-013/INV-013 — conta inativada enquanto a sessão estava aberta. O
+  // servidor passa a responder 403 CONTA_INATIVA em toda rota, e um 403 não
+  // dispara a renovação logo abaixo: sem este desvio a pessoa ficaria presa
+  // numa tela viva cheia de erros, sem entender que perdeu o acesso.
+  // Encerra a sessão como se fosse expiração, porque para ela é isso mesmo.
+  if (res.status === 403 && (await temCodigo(res.clone(), "CONTA_INATIVA"))) {
+    encerrarSessao();
+    throw new ApiError(
+      403,
+      await parseErrorMessage(res, "Esta conta está inativa. Procure o administrador."),
+    );
+  }
+
   if (res.status === 401) {
     const renovou = await renovarSessao();
     if (!renovou) {
