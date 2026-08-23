@@ -162,6 +162,17 @@ async function authFetch(path: string, init: RequestInit = {}): Promise<Response
   // dispara a renovação logo abaixo: sem este desvio a pessoa ficaria presa
   // numa tela viva cheia de erros, sem entender que perdeu o acesso.
   // Encerra a sessão como se fosse expiração, porque para ela é isso mesmo.
+  // SPEC-014:TASK-000 / INV-008 — o servidor barra tudo enquanto a senha for
+  // temporaria. Sem este desvio a pessoa veria erro seco em cada tela em vez
+  // da unica tela que resolve o problema dela.
+  if (res.status === 403 && (await temCodigo(res.clone(), "SENHA_TEMPORARIA"))) {
+    if (typeof window !== "undefined" && window.location.pathname !== "/primeiro-acesso") {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = "/primeiro-acesso";
+    }
+    throw new ApiError(403, "Crie sua senha para continuar.");
+  }
+
   if (res.status === 403 && (await temCodigo(res.clone(), "CONTA_INATIVA"))) {
     encerrarSessao();
     throw new ApiError(
@@ -231,4 +242,20 @@ export async function updateCompanyStatus(id: string, status: CompanyStatus): Pr
     body: JSON.stringify({ status }),
   });
   return (await res.json()) as Empresa;
+}
+
+/**
+ * SPEC-014:TASK-000 — troca de senha. O backend revoga todas as sessoes e
+ * devolve um par novo; quem chama precisa guardar o access token, senao a
+ * pessoa cai no login logo depois de trocar.
+ */
+export async function trocarSenha(dto: {
+  senhaAtual: string;
+  novaSenha: string;
+}): Promise<{ accessToken: string }> {
+  const res = await authFetch("/auth/trocar-senha", {
+    method: "POST",
+    body: JSON.stringify(dto),
+  });
+  return (await res.json()) as { accessToken: string };
 }
