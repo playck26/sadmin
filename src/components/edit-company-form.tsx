@@ -83,10 +83,11 @@ export function EditCompanyForm({ id }: { id: string }) {
   }
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-2xl border-0 shadow-[var(--shadow-elevated)] ring-1 ring-border">
       <CardHeader>
+        <div className="mb-2 h-1 w-12 rounded-full bg-[var(--color-secondary)]" />
         <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl">Editar empresa</CardTitle>
+          <CardTitle className="text-2xl font-extrabold">Editar empresa</CardTitle>
           <Badge variant={empresa.status === "ativa" ? "default" : "secondary"}>
             {empresa.status === "ativa" ? "Ativa" : "Inativa"}
           </Badge>

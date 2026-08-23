@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ApiError, login } from "@/lib/api-client";
@@ -32,12 +32,13 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-sm shadow-[var(--shadow-elevated)]">
-      <CardHeader>
-        <CardTitle className="text-2xl">Entrar</CardTitle>
-        <CardDescription>Painel do Super Admin — PlayCK</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="min-w-0 w-full overflow-hidden rounded-[var(--radius-hero)] bg-white p-7 shadow-[var(--shadow-lift)]">
+      <div className="mb-6 flex flex-col items-center text-center">
+        <span className="mb-5 flex size-20 items-center justify-center rounded-xl bg-white shadow-[var(--shadow-low)] ring-1 ring-border"><Image src="/playck-logo.png" alt="PlayCK" width={72} height={72} className="size-[70px] object-contain" priority /></span>
+        <p className="text-xs font-bold tracking-[0.15em] text-[var(--color-primary-strong)] uppercase">Super Admin</p>
+        <h1 className="mt-2 text-[28px] leading-tight font-extrabold">Controle da plataforma</h1>
+        <p className="mt-2 text-sm text-[var(--color-text-secondary)]">Gerencie as empresas que fazem parte da PlayCK.</p>
+      </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
@@ -49,6 +50,7 @@ export function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              className="h-11 px-4"
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -62,6 +64,7 @@ export function LoginForm() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               disabled={loading}
+              className="h-11 px-4"
             />
           </div>
           {error ? (
@@ -69,11 +72,10 @@ export function LoginForm() {
               {error}
             </p>
           ) : null}
-          <Button type="submit" disabled={loading} className="mt-2">
+          <Button type="submit" disabled={loading} className="mt-2 h-12 text-sm font-bold">
             {loading ? "Entrando..." : "Entrar"}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

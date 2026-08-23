@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { Building2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -41,13 +42,18 @@ export function CompaniesList() {
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-foreground">Empresas</h1>
-        <Button asChild>
-          <Link href="/empresas/nova">Nova empresa</Link>
+    <div className="flex flex-col gap-6">
+      <section className="relative overflow-hidden rounded-[var(--radius-hero)] bg-[var(--color-primary-strong)] p-6 text-white shadow-[var(--shadow-elevated)] md:p-8">
+        <span aria-hidden="true" className="court-lines pointer-events-none absolute inset-0 opacity-25" />
+        <div className="relative z-10 flex flex-wrap items-end justify-between gap-5">
+          <div><p className="text-xs font-bold tracking-[0.15em] text-[var(--color-secondary)] uppercase">Ecossistema PlayCK</p><h1 className="mt-2 text-3xl font-extrabold md:text-4xl">Empresas</h1><p className="mt-2 text-sm text-white/70">Administre arenas, escolas e seus acessos iniciais.</p></div>
+        <Button asChild className="h-11 bg-white px-4 font-bold text-[var(--color-primary-strong)] hover:bg-white/90">
+          <Link href="/empresas/nova"><Plus className="size-4" />Nova empresa</Link>
         </Button>
-      </div>
+        </div>
+      </section>
+
+      <div className="flex items-center justify-between"><div><h2 className="text-lg font-extrabold">Empresas cadastradas</h2><p className="text-sm text-[var(--color-text-secondary)]">{loading ? "Atualizando lista" : `${total} registros`}</p></div><span className="flex size-10 items-center justify-center rounded-lg bg-[var(--color-primary-container)] text-[var(--color-primary-strong)]"><Building2 className="size-5" /></span></div>
 
       {loading ? (
         <p className="text-[var(--color-text-secondary)]">Carregando...</p>
@@ -59,7 +65,7 @@ export function CompaniesList() {
         <p className="text-[var(--color-text-secondary)]">Nenhuma empresa cadastrada ainda.</p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-[var(--radius)] border border-border">
+          <div className="overflow-x-auto rounded-[var(--radius)] border border-border bg-white shadow-[var(--shadow-low)]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -82,7 +88,7 @@ export function CompaniesList() {
                     <TableCell className="text-right">
                       <Link
                         href={`/empresas/${empresa.id}`}
-                        className="text-sm font-medium text-[var(--color-primary)] hover:underline"
+                        className="text-sm font-bold text-[var(--color-primary-strong)] hover:underline"
                       >
                         Editar
                       </Link>

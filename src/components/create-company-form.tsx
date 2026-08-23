@@ -48,9 +48,10 @@ export function CreateCompanyForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full max-w-2xl border-0 shadow-[var(--shadow-elevated)] ring-1 ring-border">
       <CardHeader>
-        <CardTitle className="text-2xl">Nova empresa</CardTitle>
+        <div className="mb-2 h-1 w-12 rounded-full bg-[var(--color-secondary)]" />
+        <CardTitle className="text-2xl font-extrabold">Nova empresa</CardTitle>
         <CardDescription>Cadastra a empresa e o primeiro admin dela juntos</CardDescription>
       </CardHeader>
       <CardContent>
@@ -133,7 +134,7 @@ export function CreateCompanyForm() {
             </p>
           ) : null}
 
-          <Button type="submit" disabled={loading} className="mt-2">
+          <Button type="submit" disabled={loading} className="mt-2 h-11 font-bold">
             {loading ? "Criando..." : "Criar empresa"}
           </Button>
         </form>
