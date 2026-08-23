@@ -548,6 +548,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/classes/{id}/presencas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClassesController_historicoDePresenca"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/classes": {
         parameters: {
             query?: never;
@@ -637,6 +653,38 @@ export interface paths {
         };
         get: operations["MeTeacherClassesController_detalhe"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/teacher/classes/{id}/ocorrencias": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeTeacherAttendanceController_ocorrencias"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/teacher/attendance/{ocupacaoId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeTeacherAttendanceController_chamada"];
+        put: operations["MeTeacherAttendanceController_salvar"];
         post?: never;
         delete?: never;
         options?: never;
@@ -868,6 +916,16 @@ export interface components {
             capacidade?: number;
             /** @enum {string} */
             status?: "ativa" | "inativa";
+        };
+        ItemChamadaDto: {
+            alunoId: string;
+            /** @enum {string} */
+            status: "presente" | "ausente" | "justificado";
+        };
+        SalvarChamadaDto: {
+            /** @example 3:1756000000000 */
+            versao: string;
+            itens: components["schemas"]["ItemChamadaDto"][];
         };
         UpdatePaymentConfigDto: {
             linkPagamentoUrl?: string;
@@ -1852,6 +1910,27 @@ export interface operations {
             };
         };
     };
+    ClassesController_historicoDePresenca: {
+        parameters: {
+            query: {
+                dias: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ClassesController_list: {
         parameters: {
             query?: {
@@ -2019,6 +2098,69 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeTeacherAttendanceController_ocorrencias: {
+        parameters: {
+            query: {
+                dias: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeTeacherAttendanceController_chamada: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeTeacherAttendanceController_salvar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SalvarChamadaDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
