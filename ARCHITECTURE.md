@@ -1,6 +1,6 @@
 # ARCHITECTURE — `sadmin` (PlayCK)
 
-**Fonte: análise direta do código.** Data: 2026-08-22.
+**Fonte: análise direta do código.** Data: 2026-08-25.
 
 Planta **AS-IS**. Intenção arquitetural vive em `TARGET_ARCHITECTURE.md`
 (raiz do workspace) + ADRs em `DECISIONS.md`. Divergência entre este
@@ -104,6 +104,19 @@ Deploy: Netlify (plano Personal desde 2026-08-22, ADR-014).
 | `api-types.ts` nunca editado à mão | arquivo é gerado; diff denuncia |
 | Sem estado global sem ADR | busca por libs de estado no CI seria o gate — **hoje não existe** |
 | `typecheck`, `lint`, `test`, `build` verdes | CI (GitHub Actions) a cada push |
+
+### Miniatura da logo na lista de empresas (SPEC-018/TASK-006)
+
+`logo-da-empresa.tsx` — mesmo componente do `admin` e do `cliente` (ADR-001,
+duplicado de propósito). Aparece ao lado do nome, na lista de empresas, para
+distinguir clube de relance quando a lista crescer.
+
+**Não virou coluna própria**, e é decisão: o nome continua sendo o dado, e a
+logo é apoio. Sem logo, a inicial do clube.
+
+A URL vem resolvida pelo servidor (`LogoDaEmpresaService`), com o fallback
+para a `logo_url` antiga (AC-013) — o campo "URL do logo" do formulário de
+criação continua valendo e **não migra**.
 
 ## 9. Gaps e pontos de atenção
 

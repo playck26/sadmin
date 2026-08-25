@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { LogoDaEmpresa } from "@/components/logo-da-empresa";
 import { Building2, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -78,7 +79,20 @@ export function CompaniesList() {
               <TableBody>
                 {data.map((empresa) => (
                   <TableRow key={empresa.id}>
-                    <TableCell className="font-medium">{empresa.nome}</TableCell>
+                    <TableCell className="font-medium">
+                      {/* SPEC-018/TASK-006 — a miniatura existe para
+                          distinguir clube de relance quando a lista crescer.
+                          O nome continua sendo o dado; a logo é apoio, e por
+                          isso não vira coluna própria. */}
+                      <span className="flex items-center gap-3">
+                        <LogoDaEmpresa
+                          url={empresa.logoUrl}
+                          nome={empresa.nome}
+                          className="size-8 shrink-0"
+                        />
+                        {empresa.nome}
+                      </span>
+                    </TableCell>
                     <TableCell>{empresa.esportes.join(", ") || "—"}</TableCell>
                     <TableCell>
                       <Badge variant={empresa.status === "ativa" ? "default" : "secondary"}>
