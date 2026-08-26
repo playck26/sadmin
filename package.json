@@ -10,7 +10,8 @@
     "pretypecheck": "next typegen",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "gen:api-types": "openapi-typescript ../Back/openapi.json -o src/lib/api-types.ts"
+    "gen:api-types": "openapi-typescript ../Back/openapi.json -o src/lib/api-types.ts",
+    "api-types:check": "node -e \"const{execSync}=require('child_process');const fs=require('fs');const a=fs.readFileSync('src/lib/api-types.ts','utf8');execSync('npm run gen:api-types',{stdio:'ignore'});const b=fs.readFileSync('src/lib/api-types.ts','utf8');if(a!==b){console.error('api-types.ts estava DESATUALIZADO — foi regenerado agora, confira o diff e commite.');process.exit(1)}console.log('api-types.ts em dia com ../Back/openapi.json')\""
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
