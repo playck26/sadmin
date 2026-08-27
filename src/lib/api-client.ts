@@ -12,44 +12,30 @@ export type CreateCompanyDto = components["schemas"]["CreateCompanyDto"];
 export type UpdateCompanyDto = components["schemas"]["UpdateCompanyDto"];
 export type CompanyStatus = "ativa" | "inativa";
 
-export interface LoginResult {
-  accessToken: string;
-  refreshToken: string;
-  usuario: {
-    id: string;
-    nome: string;
-    role: "super_admin" | "company_admin" | "aluno";
-    companyId: string | null;
-  };
-}
-
-export interface Empresa {
-  id: string;
-  nome: string;
-  logoUrl: string | null;
-  esportes: string[];
-  status: CompanyStatus;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PaginatedCompanies {
-  data: Empresa[];
-  page: number;
-  pageSize: number;
-  total: number;
-}
-
-export interface CreateCompanyResult {
-  empresa: Empresa;
-  adminUsuario: {
-    id: string;
-    nome: string;
-    email: string;
-    role: "company_admin";
-    companyId: string;
-  };
-}
+/**
+ * SPEC-021/INV-059 — **estes tipos eram `interface` escrita à mão e viraram
+ * apelidos do schema publicado.**
+ *
+ * Até 2026-08-27 o `back` publicava schema de resposta para 10 das 90
+ * operações; hoje publica para as 90. Enquanto não havia o que gerar, todo
+ * tipo de resposta aqui era uma **afirmação** — e afirmação envelhece calada.
+ *
+ * O `LoginResult` daqui é o exemplo: ele declarava
+ * `role: "super_admin" | "company_admin" | "aluno"` e **faltava
+ * `"professor"`**, que existe desde a SPEC-013. Nunca quebrou porque ninguém
+ * tentou logar um professor no painel do super admin — o tipo estava errado e
+ * o silêncio parecia acerto.
+ *
+ * `Empresa` também omitia dois campos que a API devolve (`slug` e
+ * `permiteAutoCadastro`) e declarava `createdAt: string` onde o contrato diz
+ * `date-time`.
+ */
+export type LoginResult = components["schemas"]["LoginResponseDto"];
+export type Empresa = components["schemas"]["EmpresaResponseDto"];
+export type PaginatedCompanies =
+  components["schemas"]["EmpresaPaginadaResponseDto"];
+export type CreateCompanyResult =
+  components["schemas"]["EmpresaCriadaResponseDto"];
 
 export class ApiError extends Error {
   constructor(
@@ -236,22 +222,19 @@ export async function updateCompany(id: string, dto: UpdateCompanyDto): Promise<
   return (await res.json()) as Empresa;
 }
 
-/** SPEC-016/AC-001 — os gestores da empresa. */
-export interface AdminDaEmpresa {
-  id: string;
-  nome: string;
-  email: string;
-  status: "ativo" | "inativo";
-  senhaTemporaria: boolean;
-}
+/**
+ * SPEC-016/AC-001 — os gestores da empresa.
+ *
+ * `senhaTemporaria` aqui é **booleano** (a conta está em primeiro acesso), e
+ * em `SenhaTemporariaGerada` é a senha em si. Os dois campos têm o mesmo nome
+ * e coisas diferentes; o contrato publicado agora separa os dois DTOs, e é
+ * por isso que este apelido aponta para o de listagem.
+ */
+export type AdminDaEmpresa = components["schemas"]["AdminDaEmpresaResponseDto"];
 
-export interface SenhaTemporariaGerada {
-  usuario: { id: string; nome: string; email: string };
-  senhaTemporaria: string;
-  expiraEm: string;
-  /** AC-007 — a senha não funciona enquanto a empresa estiver inativa. */
-  empresaInativa: boolean;
-}
+/** SPEC-016 — a senha vem **uma vez só**, na resposta que a gerou. */
+export type SenhaTemporariaGerada =
+  components["schemas"]["SenhaDeAdminResponseDto"];
 
 export async function listCompanyAdmins(id: string): Promise<AdminDaEmpresa[]> {
   const res = await authFetch(`/companies/${id}/admins`);
