@@ -1183,32 +1183,123 @@ export interface components {
              */
             ordem?: number;
         };
+        TurmaEncontroResponseDto: {
+            /** @example 2 */
+            diaSemana: number;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+        };
+        TurmaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** @example Turma Iniciante */
+            nome: string;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** Format: uuid */
+            professorId: string | null;
+            /** Format: uuid */
+            quadraId: string;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            /** @example 10 */
+            capacidade: number;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            /** @example 4 */
+            alunosAlocados: number;
+        };
+        TurmaPaginadaResponseDto: {
+            data: components["schemas"]["TurmaResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 3 */
+            total: number;
+        };
+        EncontroDto: {
+            /** @description 0=domingo..6=sábado */
+            diaSemana: number;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+        };
         CreateClassDto: {
             nome: string;
             nivelId?: string;
             professorId?: string;
             quadraId: string;
-            /** @description 0=domingo..6=sábado */
-            diaSemana: number;
-            /** @example 14:00 */
-            horaInicio: string;
-            /** @example 15:00 */
-            horaFim: string;
+            encontros: components["schemas"]["EncontroDto"][];
             capacidade: number;
+        };
+        AlunoDaTurmaResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            nome: string;
+            email: string;
+        };
+        TurmaDetalheResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** @example Turma Iniciante */
+            nome: string;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** Format: uuid */
+            professorId: string | null;
+            /** Format: uuid */
+            quadraId: string;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            /** @example 10 */
+            capacidade: number;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            /** @example 4 */
+            alunosAlocados: number;
+            alunos: components["schemas"]["AlunoDaTurmaResponseDto"][];
         };
         UpdateClassDto: {
             nome?: string;
             nivelId?: string;
             professorId?: string;
             quadraId?: string;
-            diaSemana?: number;
-            /** @example 14:00 */
-            horaInicio?: string;
-            /** @example 15:00 */
-            horaFim?: string;
+            encontros?: components["schemas"]["EncontroDto"][];
             capacidade?: number;
             /** @enum {string} */
             status?: "ativa" | "inativa";
+        };
+        TurmaDoProfessorResponseDto: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            quadraNome: string;
+            nivelNome: string | null;
+            capacidade: number;
+            totalAlunos: number;
+        };
+        AlunoDoProfessorResponseDto: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            nivelNome: string | null;
+        };
+        TurmaDoProfessorDetalheResponseDto: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            quadraNome: string;
+            nivelNome: string | null;
+            capacidade: number;
+            alunos: components["schemas"]["AlunoDoProfessorResponseDto"][];
         };
         ItemChamadaDto: {
             alunoId: string;
@@ -2740,7 +2831,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TurmaPaginadaResponseDto"];
+                };
             };
         };
     };
@@ -2757,11 +2850,13 @@ export interface operations {
             };
         };
         responses: {
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TurmaResponseDto"];
+                };
             };
         };
     };
@@ -2780,7 +2875,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TurmaDetalheResponseDto"];
+                };
             };
         };
     };
@@ -2803,7 +2900,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TurmaDetalheResponseDto"];
+                };
             };
         };
     };
@@ -2877,7 +2976,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TurmaDoProfessorResponseDto"][];
+                };
             };
         };
     };
@@ -2896,7 +2997,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TurmaDoProfessorDetalheResponseDto"];
+                };
             };
         };
     };
