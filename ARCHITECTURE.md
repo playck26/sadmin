@@ -118,6 +118,36 @@ A URL vem resolvida pelo servidor (`LogoDaEmpresaService`), com o fallback
 para a `logo_url` antiga (AC-013) — o campo "URL do logo" do formulário de
 criação continua valendo e **não migra**.
 
+### O campo "Esportes" não é mais uma coluna (SPEC-020/TASK-008)
+
+`companies-list.tsx` faz `empresa.esportes.join(", ")` e os dois formulários
+mandam `esportes` como lista de texto. **Isso continua certo, e continua
+funcionando — mas o que está do outro lado mudou em 2026-08-26.**
+
+`empresas.esportes` (a coluna `text[]`) **foi derrubada** pela TASK-004. O
+campo `esportes` que a API devolve hoje é uma **projeção do catálogo**
+`esportes_de_quadra`, montada em `CompaniesService.comEsportes()`; o que o
+formulário manda **semeia esse catálogo**, não uma coluna.
+
+Três consequências que não se leem no código daqui:
+
+| O que parece | O que é |
+|---|---|
+| Editar "Esportes" mexe num campo da empresa | Editar **sincroniza o catálogo** que o gestor também edita em `admin`, na tela de catálogos |
+| A lista aceita o que for digitado | Nomes repetidos ignorando maiúscula são deduplicados no `back` antes de gravar — o catálogo tem `UNIQUE(company_id, nome)`, e "Tenis, tenis" derrubaria a criação da empresa inteira |
+| Remover um esporte da lista some com ele | Se alguma quadra usa a opção, o `back` recusa (INV-055) |
+
+**A forma da resposta foi preservada de propósito**, e a decisão está
+registrada em `companies.service.ts`: se `esportes` tivesse virado array de
+objetos, esta lista quebraria exatamente como o app do aluno quebrou no
+DEF-012 — `undefined.join()` é tela branca, não texto errado. Foi a única
+tela dos quatro repositórios que atravessou a SPEC-020 **sem precisar de
+alteração**, e isso foi construído, não sorte.
+
+**Ao mexer nesta tela, ler antes `DATA_MODEL.md` (`esportes_de_quadra`) e a
+seção 6 desta planta** — o tipo gerado continua dizendo `string[]`, e ele não
+tem como contar de onde a lista vem.
+
 ## 9. Gaps e pontos de atenção
 
 | # | Gap | Severidade |
