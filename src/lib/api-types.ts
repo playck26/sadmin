@@ -988,6 +988,27 @@ export interface components {
             email: string;
             senha: string;
         };
+        UsuarioPublicoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            role: "super_admin" | "company_admin" | "aluno" | "professor";
+            /** Format: uuid */
+            companyId: string | null;
+            senhaTemporaria?: boolean;
+        };
+        LoginResponseDto: {
+            accessToken: string;
+            refreshToken: string;
+            usuario: components["schemas"]["UsuarioPublicoResponseDto"];
+        };
+        AccessTokenResponseDto: {
+            accessToken: string;
+        };
         TrocarSenhaDto: {
             /** @description Senha atual. Para quem está no primeiro acesso, é a senha temporária recebida do admin. */
             senhaAtual: string;
@@ -1000,6 +1021,17 @@ export interface components {
             nome?: string;
             telefone?: string;
         };
+        ContaDeConviteResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: email */
+            email: string;
+            /** @example Ana Souza */
+            nome: string;
+        };
+        ConviteAceitoResponseDto: {
+            usuario: components["schemas"]["ContaDeConviteResponseDto"];
+        };
         RegisterAlunoDto: {
             email: string;
             senha: string;
@@ -1008,11 +1040,158 @@ export interface components {
             /** @example smart-tennis */
             empresaSlug: string;
         };
+        RegistroDeAlunoResponseDto: {
+            usuario: components["schemas"]["UsuarioPublicoResponseDto"];
+        };
         CriarConviteDto: {
             email?: string;
             nome?: string;
             telefone?: string;
             nivelId?: string;
+        };
+        ConviteCriadoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            token: string;
+            /** Format: date-time */
+            expiraEm: string;
+        };
+        EmpresaDoConviteResponseDto: {
+            /** @example Smart Tennis */
+            nome: string;
+        };
+        ConvitePublicoResponseDto: {
+            empresa: components["schemas"]["EmpresaDoConviteResponseDto"];
+            /** @example Ana Souza */
+            nome: string | null;
+        };
+        FotoDePerfilResponseDto: {
+            url: string | null;
+        };
+        FaltasSeguidasComposicaoResponseDto: {
+            /** @example 2 */
+            ausente: number;
+            /** @example 1 */
+            justificado: number;
+        };
+        AgregadoDeFrequenciaResponseDto: {
+            /** @example 83 */
+            frequenciaPct: number | null;
+            /** @enum {string} */
+            confianca: "alta" | "baixa";
+            /** @example 12 */
+            base: number;
+            /** @example 10 */
+            presente: number;
+            /** @example 1 */
+            ausente: number;
+            /** @example 1 */
+            justificado: number;
+            /** @example 3 */
+            faltasSeguidas: number;
+            faltasSeguidasComposicao: components["schemas"]["FaltasSeguidasComposicaoResponseDto"];
+        };
+        CoberturaResponseDto: {
+            /** @example 12 */
+            aconteceram: number;
+            /** @example 9 */
+            lancadas: number;
+            /** @example 7 */
+            completas: number;
+            /** @example 58 */
+            pctCompletas: number | null;
+            /** @enum {string} */
+            confianca: "alta" | "baixa";
+            aviso: string | null;
+        };
+        FrequenciaPorTurmaResponseDto: {
+            /** @example 83 */
+            frequenciaPct: number | null;
+            /** @enum {string} */
+            confianca: "alta" | "baixa";
+            /** @example 12 */
+            base: number;
+            /** @example 10 */
+            presente: number;
+            /** @example 1 */
+            ausente: number;
+            /** @example 1 */
+            justificado: number;
+            /** @example 3 */
+            faltasSeguidas: number;
+            faltasSeguidasComposicao: components["schemas"]["FaltasSeguidasComposicaoResponseDto"];
+            /** Format: uuid */
+            turmaId: string;
+            /** @example Turma A */
+            turmaNome: string | null;
+            naTurmaHoje: boolean;
+            cobertura: components["schemas"]["CoberturaResponseDto"];
+        };
+        OcorrenciaDoAlunoResponseDto: {
+            /** Format: uuid */
+            turmaId: string;
+            /** @example Turma A */
+            turmaNome: string | null;
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            cancelada: boolean;
+            /** @enum {string} */
+            status: "presente" | "ausente" | "justificado";
+        };
+        FrequenciaDoAlunoResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Ana Souza */
+            nome: string;
+            alunoAtivo: boolean;
+            /** @enum {string} */
+            vinculo: "pendente" | "aprovado" | "recusado";
+            /** @example 30 */
+            janelaDias: number;
+            agregado: components["schemas"]["AgregadoDeFrequenciaResponseDto"];
+            porTurma: components["schemas"]["FrequenciaPorTurmaResponseDto"][];
+            ocorrencias: components["schemas"]["OcorrenciaDoAlunoResponseDto"][];
+        };
+        AlunoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: email */
+            email: string;
+            /** @example +5511999999999 */
+            telefone: string | null;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @enum {string} */
+            status: "ativo" | "inativo";
+        };
+        AlunoPaginadoResponseDto: {
+            data: components["schemas"]["AlunoResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 137 */
+            total: number;
+        };
+        AlunoComSenhaTemporariaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: email */
+            email: string;
+            /** @example +5511999999999 */
+            telefone: string | null;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @enum {string} */
+            status: "ativo" | "inativo";
+            /** @example Xk4p-9Qm2 */
+            senhaTemporaria: string;
         };
         CreateStudentDto: {
             nome: string;
@@ -1027,10 +1206,57 @@ export interface components {
             /** @enum {string} */
             status?: "ativo" | "inativo";
         };
+        ProfessorResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** @example Carlos Lima */
+            nome: string;
+            telefone: string | null;
+            /** Format: email */
+            email: string | null;
+            /** @enum {string} */
+            status: "ativo" | "inativo";
+            /** Format: uuid */
+            usuarioId: string | null;
+            fotoUrl: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ProfessorPaginadoResponseDto: {
+            data: components["schemas"]["ProfessorResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 12 */
+            total: number;
+        };
         CreateTeacherDto: {
             nome: string;
             telefone?: string;
             email?: string;
+        };
+        ProfessorComSenhaTemporariaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** @example Carlos Lima */
+            nome: string;
+            telefone: string | null;
+            /** Format: email */
+            email: string | null;
+            /** @enum {string} */
+            status: "ativo" | "inativo";
+            /** Format: uuid */
+            usuarioId: string | null;
+            fotoUrl: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** @example Xk4p-9Qm2 */
+            senhaTemporaria: string;
         };
         UpdateTeacherDto: {
             nome?: string;
@@ -1039,6 +1265,21 @@ export interface components {
             /** @enum {string} */
             status?: "ativo" | "inativo";
         };
+        FotoDeProfessorResponseDto: {
+            fotoUrl: string | null;
+        };
+        NivelResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** @example Iniciante */
+            nome: string;
+            /** @example 0 */
+            ordem: number;
+            /** Format: date-time */
+            createdAt: string;
+        };
         CreateLevelDto: {
             nome: string;
             ordem: number;
@@ -1046,6 +1287,44 @@ export interface components {
         UpdateLevelDto: {
             nome?: string;
             ordem?: number;
+        };
+        SmokeDeTenantResponseDto: {
+            /** @example true */
+            ok: boolean;
+            /** Format: uuid */
+            companyId: string;
+        };
+        EmpresaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Smart Tennis */
+            nome: string;
+            /** @example smart-tennis */
+            slug: string;
+            /**
+             * @example [
+             *       "Tênis",
+             *       "Padel"
+             *     ]
+             */
+            esportes: string[];
+            logoUrl: string | null;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            permiteAutoCadastro: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        EmpresaPaginadaResponseDto: {
+            data: components["schemas"]["EmpresaResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 7 */
+            total: number;
         };
         AdminInicialDto: {
             nome: string;
@@ -1059,6 +1338,49 @@ export interface components {
             esportes: string[];
             adminInicial: components["schemas"]["AdminInicialDto"];
         };
+        AdminInicialResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            role: "company_admin";
+            /** Format: uuid */
+            companyId: string;
+        };
+        EmpresaCriadaResponseDto: {
+            empresa: components["schemas"]["EmpresaResponseDto"];
+            adminUsuario: components["schemas"]["AdminInicialResponseDto"];
+        };
+        AdminDaEmpresaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: email */
+            email: string;
+            /** @enum {string} */
+            status: "ativo" | "inativo";
+            senhaTemporaria: boolean;
+        };
+        ContaDeAdminResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: email */
+            email: string;
+        };
+        SenhaDeAdminResponseDto: {
+            usuario: components["schemas"]["ContaDeAdminResponseDto"];
+            /** @example pck-Xk4p-9Qm2 */
+            senhaTemporaria: string;
+            /** Format: date-time */
+            expiraEm: string;
+            empresaInativa: boolean;
+        };
         UpdateCompanyDto: {
             nome?: string;
             logoUrl?: string;
@@ -1068,9 +1390,29 @@ export interface components {
             /** @enum {string} */
             status: "ativa" | "inativa";
         };
+        EmpresaPublicaResponseDto: {
+            /** @example Smart Tennis */
+            nome: string;
+            logoUrl: string | null;
+        };
+        MinhaEmpresaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Smart Tennis */
+            nome: string;
+            /** @example smart-tennis */
+            slug: string;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            permiteAutoCadastro: boolean;
+            logoUrl: string | null;
+        };
         UpdateAutoCadastroDto: {
             /** @description Liga ou desliga o link público de auto-cadastro de alunos desta empresa. */
             permiteAutoCadastro: boolean;
+        };
+        LogoDaEmpresaResponseDto: {
+            logoUrl: string | null;
         };
         OpcaoDeCatalogoResponseDto: {
             /** Format: uuid */
@@ -1128,6 +1470,35 @@ export interface components {
             /** @enum {string} */
             status?: "ativa" | "inativa";
         };
+        SlotDeDisponibilidadeResponseDto: {
+            /** @example 18:00-19:00 */
+            slot: string;
+            /** @enum {string} */
+            status: "livre" | "ocupado_turma" | "ocupado_avulso";
+        };
+        DisponibilidadeResponseDto: {
+            /** Format: uuid */
+            quadraId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @enum {string} */
+            estado: "aberto" | "fechado";
+            slots: components["schemas"]["SlotDeDisponibilidadeResponseDto"][];
+        };
+        DiaDeHorarioResponseDto: {
+            /** @example 1 */
+            diaSemana: number;
+            fechado: boolean;
+            /** @example 06:00 */
+            horaInicio: string | null;
+            /** @example 22:00 */
+            horaFim: string | null;
+        };
+        HorariosDaQuadraResponseDto: {
+            /** @enum {string} */
+            origem: "proprio" | "herdado";
+            dias: components["schemas"]["DiaDeHorarioResponseDto"][];
+        };
         DiaHorarioDto: {
             diaSemana: number;
             fechado: boolean;
@@ -1138,6 +1509,24 @@ export interface components {
         };
         DefinirHorariosDto: {
             dias: components["schemas"]["DiaHorarioDto"][];
+        };
+        OcupacaoAfetadaResponseDto: {
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            /** @example Quadra 1 */
+            quadraNome: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            responsavel: string | null;
+        };
+        ResultadoDeHorariosResponseDto: {
+            /** @example 12 */
+            afetadasCount: number;
+            amostra: components["schemas"]["OcupacaoAfetadaResponseDto"][];
         };
         SlotDto: {
             /** @example 09:00 */
@@ -1162,6 +1551,69 @@ export interface components {
             horaFim?: string;
             alunoId?: string;
         };
+        OcupacaoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** Format: uuid */
+            quadraId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            /** Format: uuid */
+            alunoId: string | null;
+            /** @enum {string} */
+            statusPagamento: "pendente" | "pago" | "cancelado";
+            /** @example 120 */
+            valor: number | null;
+        };
+        ReservasCriadasResponseDto: {
+            reservas: components["schemas"]["OcupacaoResponseDto"][];
+        };
+        OcupacaoPaginadaResponseDto: {
+            data: components["schemas"]["OcupacaoResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 240 */
+            total: number;
+        };
+        DiaDaAgendaResponseDto: {
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 12 */
+            total: number;
+            /** @example 3 */
+            pendentes: number;
+            fechado: boolean;
+        };
+        ItemDaAgendaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Quadra 1 */
+            quadraNome: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            responsavel: string | null;
+            /** @enum {string} */
+            statusPagamento: "pendente" | "pago" | "cancelado";
+            /** @example 120 */
+            valor: number | null;
+        };
+        ImagemDaQuadraResponseDto: {
+            imagemUrl: string | null;
+        };
         CatalogoDeQuadraResponseDto: {
             /** Format: uuid */
             id: string;
@@ -1182,6 +1634,66 @@ export interface components {
              * @example 0
              */
             ordem?: number;
+        };
+        AlunoNaFrequenciaDaTurmaResponseDto: {
+            /** @example 83 */
+            frequenciaPct: number | null;
+            /** @enum {string} */
+            confianca: "alta" | "baixa";
+            /** @example 12 */
+            base: number;
+            /** @example 10 */
+            presente: number;
+            /** @example 1 */
+            ausente: number;
+            /** @example 1 */
+            justificado: number;
+            /** @example 3 */
+            faltasSeguidas: number;
+            faltasSeguidasComposicao: components["schemas"]["FaltasSeguidasComposicaoResponseDto"];
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Ana Souza */
+            nome: string;
+            naTurmaHoje: boolean;
+            alunoAtivo: boolean;
+            /** @enum {string} */
+            vinculo: "pendente" | "aprovado" | "recusado";
+        };
+        FrequenciaDaTurmaResponseDto: {
+            /** Format: uuid */
+            turmaId: string;
+            /** @example Turma A */
+            turmaNome: string;
+            /** @example 30 */
+            janelaDias: number;
+            cobertura: components["schemas"]["CoberturaResponseDto"];
+            alunos: components["schemas"]["AlunoNaFrequenciaDaTurmaResponseDto"][];
+        };
+        AlunoNoHistoricoResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** @enum {string} */
+            status: "presente" | "ausente" | "justificado";
+            naTurmaHoje: boolean;
+            alunoAtivo: boolean;
+        };
+        OcorrenciaNoHistoricoResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            cancelada: boolean;
+            chamadaFeita: boolean;
+            /** @example Carlos Lima */
+            registradoPor: string | null;
+            alunos: components["schemas"]["AlunoNoHistoricoResponseDto"][];
         };
         TurmaEncontroResponseDto: {
             /** @example 2 */
@@ -1275,6 +1787,34 @@ export interface components {
             /** @enum {string} */
             status?: "ativa" | "inativa";
         };
+        MatriculaEmTurmaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            turmaId: string;
+            /** Format: uuid */
+            alunoId: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        AulaDoAlunoResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: uuid */
+            turmaId: string | null;
+            /** @example Turma A */
+            turmaNome: string | null;
+            /** Format: uuid */
+            quadraId: string;
+            /** @example Quadra 1 */
+            quadraNome: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+        };
         TurmaDoProfessorResponseDto: {
             /** Format: uuid */
             id: string;
@@ -1301,6 +1841,49 @@ export interface components {
             capacidade: number;
             alunos: components["schemas"]["AlunoDoProfessorResponseDto"][];
         };
+        OcorrenciaDaTurmaResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            cancelada: boolean;
+            chamadaFeita: boolean;
+            /** @example 4 */
+            marcados: number;
+            /** @example 8 */
+            totalAlunos: number;
+            podeLancar: boolean;
+        };
+        LinhaDaChamadaResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** @enum {string|null} */
+            status: "presente" | "ausente" | "justificado" | null;
+            naTurmaHoje: boolean;
+        };
+        ChamadaResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: uuid */
+            turmaId: string | null;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            cancelada: boolean;
+            /** @enum {string|null} */
+            completude: "completa" | "desconhecida" | null;
+            versao: string;
+            alunos: components["schemas"]["LinhaDaChamadaResponseDto"][];
+        };
         ItemChamadaDto: {
             alunoId: string;
             /** @enum {string} */
@@ -1314,10 +1897,65 @@ export interface components {
             versao: string;
             itens: components["schemas"]["ItemChamadaDto"][];
         };
+        ChamadaSalvaResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            versao: string;
+            /** @example 8 */
+            total: number;
+        };
+        AlunoEmEvasaoResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: uuid */
+            turmaId: string;
+            /** @example Turma A */
+            turmaNome: string | null;
+            /** @enum {string} */
+            motivo: "faltas_seguidas" | "frequencia_baixa";
+            /** @example 42 */
+            frequenciaPct: number | null;
+            /** @example 12 */
+            base: number;
+            /** @example 3 */
+            faltasSeguidas: number;
+            faltasSeguidasComposicao: components["schemas"]["FaltasSeguidasComposicaoResponseDto"];
+            /** @enum {string} */
+            confianca: "alta" | "baixa";
+        };
+        EvasaoResponseDto: {
+            /** @example 4 */
+            total: number;
+            /** @example 30 */
+            janelaDias: number;
+            alunos: components["schemas"]["AlunoEmEvasaoResponseDto"][];
+        };
+        DashboardResumoResponseDto: {
+            /** @example 87 */
+            alunosAtivos: number;
+            /** @example 72 */
+            ocupacaoTurmasPct: number;
+            /** @example 45 */
+            ocupacaoQuadrasPct: number;
+        };
+        ConfiguracaoDePagamentoResponseDto: {
+            /** Format: uuid */
+            companyId: string;
+            /** @example https://pag.example/clube */
+            linkPagamentoUrl: string | null;
+            /** @example +5511999999999 */
+            whatsappNumero: string | null;
+        };
         UpdatePaymentConfigDto: {
             linkPagamentoUrl?: string;
             /** @example +5511999999999 */
             whatsappNumero?: string;
+        };
+        PagamentoPublicoResponseDto: {
+            linkPagamentoUrl: string | null;
+            whatsappNumero: string | null;
         };
         UpdatePaymentStatusDto: {
             /** @enum {string} */
@@ -1345,7 +1983,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": string;
+                };
             };
         };
     };
@@ -1366,7 +2006,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
             };
         };
     };
@@ -1383,7 +2025,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AccessTokenResponseDto"];
+                };
             };
         };
     };
@@ -1421,7 +2065,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AccessTokenResponseDto"];
+                };
             };
         };
     };
@@ -1442,7 +2088,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ConviteAceitoResponseDto"];
+                };
             };
         };
     };
@@ -1463,7 +2111,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["RegistroDeAlunoResponseDto"];
+                };
             };
         };
     };
@@ -1480,7 +2130,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UsuarioPublicoResponseDto"];
+                };
             };
         };
     };
@@ -1501,7 +2153,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ConviteCriadoResponseDto"];
+                };
             };
         };
     };
@@ -1520,7 +2174,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ConvitePublicoResponseDto"];
+                };
             };
         };
     };
@@ -1537,7 +2193,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FotoDePerfilResponseDto"];
+                };
             };
         };
     };
@@ -1561,7 +2219,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FotoDePerfilResponseDto"];
+                };
             };
         };
     };
@@ -1599,7 +2259,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FrequenciaDoAlunoResponseDto"];
+                };
             };
         };
     };
@@ -1620,7 +2282,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoPaginadoResponseDto"];
+                };
             };
         };
     };
@@ -1641,7 +2305,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoComSenhaTemporariaResponseDto"];
+                };
             };
         };
     };
@@ -1660,7 +2326,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoComSenhaTemporariaResponseDto"];
+                };
             };
         };
     };
@@ -1679,7 +2347,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoResponseDto"];
+                };
             };
         };
     };
@@ -1698,7 +2368,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoResponseDto"];
+                };
             };
         };
     };
@@ -1717,7 +2389,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoResponseDto"];
+                };
             };
         };
     };
@@ -1740,7 +2414,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AlunoResponseDto"];
+                };
             };
         };
     };
@@ -1760,7 +2436,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ProfessorPaginadoResponseDto"];
+                };
             };
         };
     };
@@ -1781,7 +2459,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ProfessorResponseDto"];
+                };
             };
         };
     };
@@ -1800,7 +2480,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ProfessorComSenhaTemporariaResponseDto"];
+                };
             };
         };
     };
@@ -1819,7 +2501,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ProfessorResponseDto"];
+                };
             };
         };
     };
@@ -1842,7 +2526,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ProfessorResponseDto"];
+                };
             };
         };
     };
@@ -1868,7 +2554,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FotoDeProfessorResponseDto"];
+                };
             };
         };
     };
@@ -1887,7 +2575,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FotoDeProfessorResponseDto"];
+                };
             };
         };
     };
@@ -1904,7 +2594,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["NivelResponseDto"][];
+                };
             };
         };
     };
@@ -1925,7 +2617,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["NivelResponseDto"];
+                };
             };
         };
     };
@@ -1967,7 +2661,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["NivelResponseDto"];
+                };
             };
         };
     };
@@ -1986,7 +2682,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SmokeDeTenantResponseDto"];
+                };
             };
         };
     };
@@ -2006,7 +2704,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EmpresaPaginadaResponseDto"];
+                };
             };
         };
     };
@@ -2027,7 +2727,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EmpresaCriadaResponseDto"];
+                };
             };
         };
     };
@@ -2046,7 +2748,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2069,7 +2773,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2088,7 +2794,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AdminDaEmpresaResponseDto"][];
+                };
             };
         };
     };
@@ -2108,7 +2816,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SenhaDeAdminResponseDto"];
+                };
             };
         };
     };
@@ -2131,7 +2841,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2150,7 +2862,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EmpresaPublicaResponseDto"];
+                };
             };
         };
     };
@@ -2167,7 +2881,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MinhaEmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2188,7 +2904,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MinhaEmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2214,7 +2932,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["LogoDaEmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2233,7 +2953,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["LogoDaEmpresaResponseDto"];
+                };
             };
         };
     };
@@ -2345,7 +3067,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DisponibilidadeResponseDto"];
+                };
             };
         };
     };
@@ -2364,7 +3088,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HorariosDaQuadraResponseDto"];
+                };
             };
         };
     };
@@ -2387,7 +3113,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ResultadoDeHorariosResponseDto"];
+                };
             };
         };
     };
@@ -2406,7 +3134,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ResultadoDeHorariosResponseDto"];
+                };
             };
         };
     };
@@ -2428,7 +3158,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["OcupacaoPaginadaResponseDto"];
+                };
             };
         };
     };
@@ -2451,7 +3183,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ReservasCriadasResponseDto"];
+                };
             };
         };
     };
@@ -2487,7 +3221,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["HorariosDaQuadraResponseDto"];
+                };
             };
         };
     };
@@ -2508,7 +3244,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ResultadoDeHorariosResponseDto"];
+                };
             };
         };
     };
@@ -2528,7 +3266,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DiaDaAgendaResponseDto"][];
+                };
             };
         };
     };
@@ -2547,7 +3287,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ItemDaAgendaResponseDto"][];
+                };
             };
         };
     };
@@ -2578,7 +3320,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ImagemDaQuadraResponseDto"];
+                };
             };
         };
     };
@@ -2597,7 +3341,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ImagemDaQuadraResponseDto"];
+                };
             };
         };
     };
@@ -2790,7 +3536,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FrequenciaDaTurmaResponseDto"];
+                };
             };
         };
     };
@@ -2811,7 +3559,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["OcorrenciaNoHistoricoResponseDto"][];
+                };
             };
         };
     };
@@ -2922,7 +3672,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MatriculaEmTurmaResponseDto"];
+                };
             };
         };
     };
@@ -2959,7 +3711,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["AulaDoAlunoResponseDto"][];
+                };
             };
         };
     };
@@ -3020,7 +3774,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["OcorrenciaDaTurmaResponseDto"][];
+                };
             };
         };
     };
@@ -3039,7 +3795,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ChamadaResponseDto"];
+                };
             };
         };
     };
@@ -3062,7 +3820,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ChamadaSalvaResponseDto"];
+                };
             };
         };
     };
@@ -3081,7 +3841,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["EvasaoResponseDto"];
+                };
             };
         };
     };
@@ -3101,7 +3863,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["DashboardResumoResponseDto"];
+                };
             };
         };
     };
@@ -3118,7 +3882,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ConfiguracaoDePagamentoResponseDto"];
+                };
             };
         };
     };
@@ -3139,7 +3905,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ConfiguracaoDePagamentoResponseDto"];
+                };
             };
         };
     };
@@ -3156,7 +3924,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PagamentoPublicoResponseDto"];
+                };
             };
         };
     };
@@ -3179,7 +3949,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["OcupacaoResponseDto"];
+                };
             };
         };
     };
