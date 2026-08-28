@@ -1569,7 +1569,7 @@ export interface components {
             /** Format: uuid */
             alunoId: string | null;
             /** @enum {string} */
-            statusPagamento: "pendente" | "pago" | "cancelado";
+            statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
             valor: number | null;
         };
@@ -1584,6 +1584,15 @@ export interface components {
             pageSize: number;
             /** @example 240 */
             total: number;
+        };
+        QuadraComHorarioProprioResponseDto: {
+            /** Format: uuid */
+            quadraId: string;
+            dias: components["schemas"]["DiaDeHorarioResponseDto"][];
+        };
+        ConfiguracaoDeHorariosResponseDto: {
+            padrao: components["schemas"]["DiaDeHorarioResponseDto"][];
+            quadrasComHorarioProprio: components["schemas"]["QuadraComHorarioProprioResponseDto"][];
         };
         DiaDaAgendaResponseDto: {
             /** @example 2026-09-01 */
@@ -1607,7 +1616,7 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             responsavel: string | null;
             /** @enum {string} */
-            statusPagamento: "pendente" | "pago" | "cancelado";
+            statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
             valor: number | null;
         };
@@ -3222,7 +3231,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HorariosDaQuadraResponseDto"];
+                    "application/json": components["schemas"]["ConfiguracaoDeHorariosResponseDto"];
                 };
             };
         };
