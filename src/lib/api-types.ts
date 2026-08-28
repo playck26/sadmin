@@ -497,7 +497,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["MeCompanyController_definirAutoCadastro"];
+        patch: operations["MeCompanyController_atualizarMinhaEmpresa"];
         trace?: never;
     };
     "/api/v1/companies/{id}/logo": {
@@ -831,6 +831,38 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/classes/disponiveis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeClassesController_disponiveis"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/classes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeClassesController_entrar"];
+        delete: operations["MeClassesController_sair"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1405,11 +1437,18 @@ export interface components {
             /** @enum {string} */
             status: "ativa" | "inativa";
             permiteAutoCadastro: boolean;
+            /** @example 2 */
+            limiteTurmasPorAluno: number | null;
             logoUrl: string | null;
         };
-        UpdateAutoCadastroDto: {
+        UpdateMinhaEmpresaDto: {
             /** @description Liga ou desliga o link público de auto-cadastro de alunos desta empresa. */
-            permiteAutoCadastro: boolean;
+            permiteAutoCadastro?: boolean;
+            /**
+             * @description Quantas turmas um aluno pode entrar por conta própria. `null` = sem limite. Vale para ENTRAR, nunca para expulsar (INV-023a): baixar o limite não tira ninguém de turma em que já está.
+             * @example 2
+             */
+            limiteTurmasPorAluno?: Record<string, never> | null;
         };
         LogoDaEmpresaResponseDto: {
             logoUrl: string | null;
@@ -1823,6 +1862,64 @@ export interface components {
             horaInicio: string;
             /** @example 19:00 */
             horaFim: string;
+        };
+        EncontroDaTurmaDisponivelDto: {
+            /**
+             * @description 0 = domingo, 6 = sábado
+             * @example 2
+             */
+            diaSemana: number;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+        };
+        TurmaDisponivelResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Iniciantes — Terça e Quinta */
+            nome: string;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            /** @example 8 */
+            capacidade: number;
+            /**
+             * @description Quantos alunos já estão na turma. Vem da mesma fonte que a trava de capacidade (INV-003) — uma segunda contagem seria uma segunda verdade.
+             * @example 6
+             */
+            matriculados: number;
+            /** @example false */
+            jaEstouNela: boolean;
+            /**
+             * @description Calculado no servidor. Se a tela deduzisse, viraria uma segunda cópia das regras — e é a cópia que fica velha.
+             * @example true
+             */
+            podeEntrar: boolean;
+            /**
+             * @description Por que não pode entrar. `null` quando pode.
+             * @enum {string|null}
+             */
+            motivo?: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | null;
+            encontros: components["schemas"]["EncontroDaTurmaDisponivelDto"][];
+        };
+        MatriculaDoAlunoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            turmaId: string;
+            /** Format: uuid */
+            alunoId: string;
+        };
+        ErroDeMatriculaResponseDto: {
+            /** @example 409 */
+            statusCode: number;
+            /**
+             * @description O código é o contrato; a mensagem é texto para humano e pode mudar sem aviso. Tela que decide pela mensagem quebra na primeira revisão de copy.
+             * @enum {string}
+             */
+            code: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | "AULA_HOJE";
+            /** @example Esta turma já está com todas as vagas ocupadas. */
+            message: string;
         };
         TurmaDoProfessorResponseDto: {
             /** Format: uuid */
@@ -2896,7 +2993,7 @@ export interface operations {
             };
         };
     };
-    MeCompanyController_definirAutoCadastro: {
+    MeCompanyController_atualizarMinhaEmpresa: {
         parameters: {
             query?: never;
             header?: never;
@@ -2905,7 +3002,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UpdateAutoCadastroDto"];
+                "application/json": components["schemas"]["UpdateMinhaEmpresaDto"];
             };
         };
         responses: {
@@ -3722,6 +3819,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AulaDoAlunoResponseDto"][];
+                };
+            };
+        };
+    };
+    MeClassesController_disponiveis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurmaDisponivelResponseDto"][];
+                };
+            };
+        };
+    };
+    MeClassesController_entrar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaDoAlunoResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroDeMatriculaResponseDto"];
+                };
+            };
+            /** @description Turma inexistente — ou de outra empresa. São 404 iguais de propósito (INV-023b): distinguir já entregaria informação sobre o outro clube. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroDeMatriculaResponseDto"];
+                };
+            };
+        };
+    };
+    MeClassesController_sair: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Turma inexistente, de outra empresa, ou o aluno não está nela. Sair de onde não se está é engano, e silenciar esconderia bug de tela. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroDeMatriculaResponseDto"];
                 };
             };
         };
