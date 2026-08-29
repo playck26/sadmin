@@ -1060,6 +1060,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/teacher/agenda": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeTeacherAgendaController_resumoDoMes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/teacher/agenda/{data}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeTeacherAgendaController_detalheDoDia"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dashboard/evasao": {
         parameters: {
             query?: never;
@@ -2285,6 +2317,41 @@ export interface components {
             versao: string;
             /** @example 8 */
             total: number;
+        };
+        DiaDaAgendaDoProfessorDto: {
+            /** @example 2026-09-01 */
+            data: string;
+            /**
+             * @description Quantas aulas dele neste dia.
+             * @example 2
+             */
+            aulas: number;
+            /**
+             * @description Quantas ainda sem chamada registrada. É esta contagem que faz o calendário valer: a grade ele já conhece de cabeça; o que falta registrar, não.
+             * @example 1
+             */
+            pendentes: number;
+        };
+        AulaDoDiaDoProfessorDto: {
+            /**
+             * Format: uuid
+             * @description O MESMO id que `PUT /me/teacher/attendance/:ocupacaoId` aceita (INV-026b). Se divergirem, o caminho quebra no último passo.
+             */
+            ocupacaoId: string;
+            /** Format: uuid */
+            turmaId: string | null;
+            turmaNome: string | null;
+            /** @example Quadra 1 */
+            quadraNome: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /**
+             * @description `pendente` = não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`.
+             * @enum {string}
+             */
+            chamada: "pendente" | "feita" | "legada";
         };
         AlunoEmEvasaoResponseDto: {
             /** Format: uuid */
@@ -4538,6 +4605,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChamadaSalvaResponseDto"];
+                };
+            };
+        };
+    };
+    MeTeacherAgendaController_resumoDoMes: {
+        parameters: {
+            query: {
+                /** @description AAAA-MM */
+                mes: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiaDaAgendaDoProfessorDto"][];
+                };
+            };
+        };
+    };
+    MeTeacherAgendaController_detalheDoDia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description AAAA-MM-DD */
+                data: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AulaDoDiaDoProfessorDto"][];
                 };
             };
         };
