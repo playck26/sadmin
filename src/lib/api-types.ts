@@ -388,6 +388,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/aceites/pendentes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeAceitesController_pendentes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/aceites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeAceitesController_aceitar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/company/contrato": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContratoDaEmpresaController_vigente"];
+        put: operations["ContratoDaEmpresaController_publicar"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/company/contrato/alcance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ContratoDaEmpresaController_alcance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/companies": {
         parameters: {
             query?: never;
@@ -1052,6 +1116,10 @@ export interface components {
             email?: string;
             nome?: string;
             telefone?: string;
+            /** @example 1 */
+            termoVersao?: number;
+            /** @example 3 */
+            contratoVersao?: number;
         };
         ContaDeConviteResponseDto: {
             /** Format: uuid */
@@ -1092,8 +1160,14 @@ export interface components {
             /** @example Smart Tennis */
             nome: string;
         };
+        ContratoDoConviteDto: {
+            /** @example 3 */
+            versao: number;
+            texto: string;
+        };
         ConvitePublicoResponseDto: {
             empresa: components["schemas"]["EmpresaDoConviteResponseDto"];
+            contrato: components["schemas"]["ContratoDoConviteDto"] | null;
             /** @example Ana Souza */
             nome: string | null;
         };
@@ -1325,6 +1399,59 @@ export interface components {
             ok: boolean;
             /** Format: uuid */
             companyId: string;
+        };
+        TextoParaAceiteDto: {
+            /** @example 1 */
+            versao: number;
+            /** @description Texto puro, com quebras de linha preservadas. Markdown e HTML ficam fora de propósito: HTML vindo do gestor seria XSS na tela do aluno. */
+            texto: string;
+        };
+        AceitesPendentesResponseDto: {
+            /** @description null quando o termo vigente já foi aceito. */
+            termo: components["schemas"]["TextoParaAceiteDto"] | null;
+            /** @description null quando já aceito — ou quando o clube não publicou contrato nenhum (REQ-005). */
+            contrato: components["schemas"]["TextoParaAceiteDto"] | null;
+        };
+        RegistrarAceiteDto: {
+            /**
+             * @description A versão do termo que a pessoa LEU. Exigida para que ninguém aceite "o que estiver valendo" — seria concordar com um texto que não viu.
+             * @example 1
+             */
+            termo?: number;
+            /**
+             * @description A versão do contrato do clube que a pessoa LEU.
+             * @example 3
+             */
+            contrato?: number;
+        };
+        AceiteRegistradoResponseDto: {
+            /** @example 1 */
+            termoVersaoAceita: number | null;
+            /** @example 3 */
+            contratoVersaoAceita: number | null;
+            /**
+             * @description true quando ainda falta aceitar alguma coisa.
+             * @example false
+             */
+            aindaPendente: boolean;
+        };
+        ErroDeAceiteResponseDto: {
+            /** @example 403 */
+            statusCode: number;
+            /** @enum {string} */
+            code: "ACEITE_PENDENTE" | "VERSAO_DESATUALIZADA";
+            /** @example Há termos pendentes de aceite (GET /me/aceites/pendentes). */
+            message: string;
+        };
+        ContratoDaEmpresaResponseDto: {
+            /** @example 3 */
+            versao: number | null;
+            texto: string | null;
+            /** Format: date-time */
+            publicadoEm: string | null;
+        };
+        PublicarContratoDto: {
+            texto: string;
         };
         EmpresaResponseDto: {
             /** Format: uuid */
@@ -2790,6 +2917,120 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SmokeDeTenantResponseDto"];
+                };
+            };
+        };
+    };
+    MeAceitesController_pendentes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AceitesPendentesResponseDto"];
+                };
+            };
+        };
+    };
+    MeAceitesController_aceitar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegistrarAceiteDto"];
+            };
+        };
+        responses: {
+            /** @description Aceite registrado. Idempotente: aceitar de novo não cria segunda linha. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AceiteRegistradoResponseDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroDeAceiteResponseDto"];
+                };
+            };
+        };
+    };
+    ContratoDaEmpresaController_vigente: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContratoDaEmpresaResponseDto"];
+                };
+            };
+        };
+    };
+    ContratoDaEmpresaController_publicar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublicarContratoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContratoDaEmpresaResponseDto"];
+                };
+            };
+        };
+    };
+    ContratoDaEmpresaController_alcance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        pessoas?: number;
+                    };
                 };
             };
         };
