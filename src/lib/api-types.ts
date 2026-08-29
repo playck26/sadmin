@@ -804,6 +804,22 @@ export interface paths {
         patch: operations["CourtCategoriesController_update"];
         trace?: never;
     };
+    "/api/v1/classes/{id}/avaliacoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClassesController_avaliacoesDaTurma"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/classes/{id}/frequencia": {
         parameters: {
             query?: never;
@@ -927,6 +943,54 @@ export interface paths {
         put?: never;
         post: operations["MeClassesController_entrar"];
         delete: operations["MeClassesController_sair"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/classes/anteriores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeClassesController_aulasAnteriores"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/classes/{id}/avaliacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeClassesController_mediaDaTurma"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/classes/aulas/{ocupacaoId}/avaliacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["MeClassesController_avaliarAula"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1810,6 +1874,35 @@ export interface components {
              */
             ordem?: number;
         };
+        AvaliacaoParaOGestorDto: {
+            /** @example Ana Souza */
+            alunoNome: string;
+            /** @example 4 */
+            nota: number;
+            comentario: string | null;
+            /**
+             * @description A data da AULA, não a do registro: é ela que diz ao gestor qual terça-feira investigar.
+             * @example 2026-08-12
+             */
+            dataDaAula: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** Format: date-time */
+            avaliadaEm: string;
+            /**
+             * @description Calculado no servidor. Se a tela calculasse, a régua de detrator viraria uma segunda cópia da regra.
+             * @example true
+             */
+            detrator: boolean;
+        };
+        AvaliacoesDaTurmaResponseDto: {
+            /** @description Ordenadas por PIOR NOTA primeiro. A ordem é a funcionalidade: ordenar por data enterraria o 1 da semana passada embaixo dos 5 de ontem. */
+            itens: components["schemas"]["AvaliacaoParaOGestorDto"][];
+            /** @example 2 */
+            detratores: number;
+            /** @example 2 */
+            notaMaximaDeDetrator: number;
+        };
         AlunoNaFrequenciaDaTurmaResponseDto: {
             /** @example 83 */
             frequenciaPct: number | null;
@@ -2046,6 +2139,62 @@ export interface components {
              */
             code: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | "AULA_HOJE";
             /** @example Esta turma já está com todas as vagas ocupadas. */
+            message: string;
+        };
+        AulaAnteriorResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: uuid */
+            turmaId: string | null;
+            turmaNome: string | null;
+            /** @example Quadra 1 */
+            quadraNome: string;
+            /** @example 2026-08-12 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @description null quando ainda não avaliou. Vem junto para a tela distinguir "não avaliei" de "dei 4" sem uma requisição por linha. */
+            minhaNota: number | null;
+            meuComentario: string | null;
+        };
+        MediaDaTurmaResponseDto: {
+            /**
+             * @description null enquanto não houver o mínimo de avaliações. Uma casa decimal: a tela desenha estrelas, e precisão maior seria falsa.
+             * @example 4.3
+             */
+            media: number | null;
+            /**
+             * @description Aparece mesmo abaixo do mínimo — esconder a contagem faria a tela não conseguir dizer "ainda faltam avaliações", que é informação útil e não identifica ninguém.
+             * @example 7
+             */
+            quantidade: number;
+            /** @example 3 */
+            minimoParaMedia: number;
+        };
+        AvaliarAulaDto: {
+            /**
+             * @description Nota inteira de 1 a 5. O banco tem CHECK equivalente — o DTO protege a API, o CHECK protege a tabela.
+             * @example 5
+             */
+            nota: number;
+            /** @description Texto puro. Sem markdown nem HTML: isto aparece no painel do gestor, e HTML vindo do aluno seria XSS lá dentro. */
+            comentario?: string;
+        };
+        MinhaAvaliacaoResponseDto: {
+            /** @example 5 */
+            nota: number | null;
+            comentario: string | null;
+            /** Format: date-time */
+            updatedAt: string | null;
+        };
+        ErroDeAvaliacaoResponseDto: {
+            /** @example 403 */
+            statusCode: number;
+            /** @enum {string} */
+            code: "NAO_MATRICULADO" | "AULA_NAO_TERMINOU";
+            /** @example Você só pode avaliar turmas em que está matriculado. */
             message: string;
         };
         TurmaDoProfessorResponseDto: {
@@ -3866,6 +4015,34 @@ export interface operations {
             };
         };
     };
+    ClassesController_avaliacoesDaTurma: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvaliacoesDaTurmaResponseDto"];
+                };
+            };
+            /** @description Turma inexistente ou de outra empresa — as duas respondem igual. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ClassesController_frequencia: {
         parameters: {
             query: {
@@ -4157,6 +4334,101 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErroDeMatriculaResponseDto"];
+                };
+            };
+        };
+    };
+    MeClassesController_aulasAnteriores: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AulaAnteriorResponseDto"][];
+                };
+            };
+        };
+    };
+    MeClassesController_mediaDaTurma: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaDaTurmaResponseDto"];
+                };
+            };
+            /** @description Turma inexistente ou de outra empresa — as duas respondem igual. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeClassesController_avaliarAula: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvaliarAulaDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MinhaAvaliacaoResponseDto"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroDeAvaliacaoResponseDto"];
+                };
+            };
+            /** @description Aula inexistente, de outra empresa, ou ocupação avulsa (que não é aula de turma). Os três respondem igual de propósito. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroDeAvaliacaoResponseDto"];
                 };
             };
         };
