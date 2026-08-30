@@ -2191,6 +2191,15 @@ export interface components {
             minhaNota: number | null;
             meuComentario: string | null;
         };
+        AulasAnterioresPaginadasResponseDto: {
+            data: components["schemas"]["AulaAnteriorResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 37 */
+            total: number;
+        };
         MediaDaTurmaResponseDto: {
             /**
              * @description null enquanto não houver o mínimo de avaliações. Uma casa decimal: a tela desenha estrelas, e precisão maior seria falsa.
@@ -2271,6 +2280,20 @@ export interface components {
             /** @example 8 */
             totalAlunos: number;
             podeLancar: boolean;
+            /**
+             * @description `futura` = ainda não começou. `em_andamento` = começou e não terminou. `pendente` = terminou sem chamada. `feita` = há presenças. `cancelada` = ocorrência cancelada.
+             * @enum {string}
+             */
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "cancelada";
+        };
+        OcorrenciasDaTurmaPaginadasResponseDto: {
+            data: components["schemas"]["OcorrenciaDaTurmaResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 38 */
+            total: number;
         };
         LinhaDaChamadaResponseDto: {
             /** Format: uuid */
@@ -2348,10 +2371,10 @@ export interface components {
             /** @example 19:00 */
             horaFim: string;
             /**
-             * @description `pendente` = não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`.
+             * @description `futura` = ainda não começou; a chamada **não** pode ser lançada. `em_andamento` = começou e não terminou; pode lançar, e não é pendência. `pendente` = já terminou e não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`.
              * @enum {string}
              */
-            chamada: "pendente" | "feita" | "legada";
+            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada";
         };
         AlunoEmEvasaoResponseDto: {
             /** Format: uuid */
@@ -3707,6 +3730,8 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "pendente_pagamento" | "pago" | "cancelado";
+                /** @description Exclui ocupações canceladas. Combina com `status`. */
+                excluirCanceladas?: boolean;
                 data?: string;
                 page?: number;
                 pageSize?: number;
@@ -4408,7 +4433,10 @@ export interface operations {
     };
     MeClassesController_aulasAnteriores: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4420,7 +4448,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AulaAnteriorResponseDto"][];
+                    "application/json": components["schemas"]["AulasAnterioresPaginadasResponseDto"];
                 };
             };
         };
@@ -4545,6 +4573,8 @@ export interface operations {
         parameters: {
             query: {
                 dias: number;
+                page?: number;
+                pageSize?: number;
             };
             header?: never;
             path: {
@@ -4559,7 +4589,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OcorrenciaDaTurmaResponseDto"][];
+                    "application/json": components["schemas"]["OcorrenciasDaTurmaPaginadasResponseDto"];
                 };
             };
         };
