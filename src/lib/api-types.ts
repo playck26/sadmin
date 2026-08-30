@@ -3730,7 +3730,7 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "pendente_pagamento" | "pago" | "cancelado";
-                /** @description Exclui ocupações canceladas. Combina com `status`. */
+                /** @description Exclui ocupações canceladas. Pode ser combinado com `status` — os dois viram um `AND`, então `status=pago&excluirCanceladas=true` devolve só as pagas. */
                 excluirCanceladas?: boolean;
                 data?: string;
                 page?: number;
