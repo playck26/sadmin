@@ -2154,6 +2154,8 @@ export interface components {
             horaInicio: string;
             /** @example 19:00 */
             horaFim: string;
+            /** @example false */
+            naoRealizada: boolean;
         };
         EncontroDaTurmaDisponivelDto: {
             /**
