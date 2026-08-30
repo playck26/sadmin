@@ -2232,6 +2232,8 @@ export interface components {
             /** @description null quando ainda não avaliou. Vem junto para a tela distinguir "não avaliei" de "dei 4" sem uma requisição por linha. */
             minhaNota: number | null;
             meuComentario: string | null;
+            /** @example false */
+            naoRealizada: boolean;
         };
         AulasAnterioresPaginadasResponseDto: {
             data: components["schemas"]["AulaAnteriorResponseDto"][];
