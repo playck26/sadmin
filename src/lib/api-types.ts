@@ -3840,6 +3840,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description AAAA-MM-DD */
                 data: string;
             };
             cookie?: never;
@@ -4612,7 +4613,7 @@ export interface operations {
     MeTeacherAgendaController_resumoDoMes: {
         parameters: {
             query: {
-                /** @description AAAA-MM */
+                /** @description AAAA-MM (ano 2000–2099) */
                 mes: string;
             };
             header?: never;
