@@ -852,6 +852,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/classes/{turmaId}/presencas/{ocupacaoId}/nao-houve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ClassesController_naoHouve"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/classes": {
         parameters: {
             query?: never;
@@ -1053,6 +1069,22 @@ export interface paths {
         };
         get: operations["MeTeacherAttendanceController_chamada"];
         put: operations["MeTeacherAttendanceController_salvar"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/teacher/attendance/{ocupacaoId}/nao-houve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["MeTeacherAttendanceController_naoHouve"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1991,9 +2023,17 @@ export interface components {
             horaFim: string;
             cancelada: boolean;
             chamadaFeita: boolean;
+            /** @enum {string} */
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "cancelada";
             /** @example Carlos Lima */
             registradoPor: string | null;
             alunos: components["schemas"]["AlunoNoHistoricoResponseDto"][];
+        };
+        ChamadaNaoHouveResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** @example nao_houve */
+            completude: string;
         };
         TurmaEncontroResponseDto: {
             /** @example 2 */
@@ -2232,7 +2272,7 @@ export interface components {
             /** @example 403 */
             statusCode: number;
             /** @enum {string} */
-            code: "NAO_MATRICULADO" | "AULA_NAO_TERMINOU";
+            code: "NAO_MATRICULADO" | "AULA_NAO_TERMINOU" | "AULA_NAO_REALIZADA";
             /** @example Você só pode avaliar turmas em que está matriculado. */
             message: string;
         };
@@ -2279,10 +2319,10 @@ export interface components {
             totalAlunos: number;
             podeLancar: boolean;
             /**
-             * @description `futura` = ainda não começou. `em_andamento` = começou e não terminou. `pendente` = terminou sem chamada. `feita` = há presenças. `cancelada` = ocorrência cancelada.
+             * @description `futura` = ainda não começou. `em_andamento` = começou e não terminou. `pendente` = terminou sem chamada. `feita` = chamada declarada completa. `legada` = chamada anterior à SPEC-015. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030). `cancelada` = ocorrência cancelada.
              * @enum {string}
              */
-            estado: "futura" | "em_andamento" | "pendente" | "feita" | "cancelada";
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "cancelada";
         };
         OcorrenciasDaTurmaPaginadasResponseDto: {
             data: components["schemas"]["OcorrenciaDaTurmaResponseDto"][];
@@ -2315,7 +2355,7 @@ export interface components {
             horaFim: string;
             cancelada: boolean;
             /** @enum {string|null} */
-            completude: "completa" | "desconhecida" | null;
+            completude: "completa" | "desconhecida" | "nao_houve" | null;
             versao: string;
             alunos: components["schemas"]["LinhaDaChamadaResponseDto"][];
         };
@@ -2369,10 +2409,10 @@ export interface components {
             /** @example 19:00 */
             horaFim: string;
             /**
-             * @description `futura` = ainda não começou; a chamada **não** pode ser lançada. `em_andamento` = começou e não terminou; pode lançar, e não é pendência. `pendente` = já terminou e não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`.
+             * @description `futura` = ainda não começou; a chamada **não** pode ser lançada. `em_andamento` = começou e não terminou; pode lançar, e não é pendência. `pendente` = já terminou e não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030); **não** é pendência e não pinta o ponto vermelho. `cancelada` não aparece aqui: o filtro do calendário a exclui antes.
              * @enum {string}
              */
-            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada";
+            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve";
         };
         AlunoEmEvasaoResponseDto: {
             /** Format: uuid */
@@ -4180,6 +4220,28 @@ export interface operations {
             };
         };
     };
+    ClassesController_naoHouve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                turmaId: string;
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChamadaNaoHouveResponseDto"];
+                };
+            };
+        };
+    };
     ClassesController_list: {
         parameters: {
             query?: {
@@ -4634,6 +4696,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChamadaSalvaResponseDto"];
+                };
+            };
+        };
+    };
+    MeTeacherAttendanceController_naoHouve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChamadaNaoHouveResponseDto"];
                 };
             };
         };
