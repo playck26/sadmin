@@ -2202,17 +2202,15 @@ export interface components {
         };
         MediaDaTurmaResponseDto: {
             /**
-             * @description null enquanto não houver o mínimo de avaliações. Uma casa decimal: a tela desenha estrelas, e precisão maior seria falsa.
+             * @description null quando ainda não há nenhuma avaliação. Uma casa decimal: a tela desenha estrelas, e precisão maior seria falsa.
              * @example 4.3
              */
             media: number | null;
             /**
-             * @description Aparece mesmo abaixo do mínimo — esconder a contagem faria a tela não conseguir dizer "ainda faltam avaliações", que é informação útil e não identifica ninguém.
+             * @description Quantas avaliações compõem a média. A tela mostra ao lado dela — média sem o tamanho da amostra faz 5,0 de uma nota parecer 5,0 de vinte.
              * @example 7
              */
             quantidade: number;
-            /** @example 3 */
-            minimoParaMedia: number;
         };
         AvaliarAulaDto: {
             /**
