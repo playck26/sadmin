@@ -676,6 +676,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/bookings/{id}/eventos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["BookingsController_eventos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/company-settings/horarios": {
         parameters: {
             query?: never;
@@ -1870,14 +1886,61 @@ export interface components {
         ReservasCriadasResponseDto: {
             reservas: components["schemas"]["OcupacaoResponseDto"][];
         };
+        ItemDaListaDeReservasDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** Format: uuid */
+            quadraId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            /** Format: uuid */
+            alunoId: string | null;
+            /** @enum {string} */
+            statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
+            /** @example 120 */
+            valor: number | null;
+            /** @description Foi quem está pedindo que cancelou? `true` = eu, `false` = outra pessoa, `null` = não foi cancelada, não há evento registrado (anterior à SPEC-032), ou quem pede é o gestor. **Nunca traz nome, id ou objeto do autor** (INV-092). */
+            canceladaPorMim: boolean | null;
+        };
         OcupacaoPaginadaResponseDto: {
-            data: components["schemas"]["OcupacaoResponseDto"][];
+            data: components["schemas"]["ItemDaListaDeReservasDto"][];
             /** @example 1 */
             page: number;
             /** @example 20 */
             pageSize: number;
             /** @example 240 */
             total: number;
+        };
+        AutorDoEventoDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Maria */
+            nome: string;
+        };
+        EventoDeOcupacaoResponseDto: {
+            /**
+             * @description O efeito TÉCNICO sobre esta ocupação.
+             * @enum {string}
+             */
+            tipo: "criada" | "cancelada" | "reativada" | "pagamento_confirmado";
+            /** Format: date-time */
+            em: string;
+            /**
+             * @description O GESTO humano que provocou o evento.
+             * @enum {string}
+             */
+            acao: "reserva_criada" | "reserva_cancelada" | "pagamento_confirmado" | "turma_criada" | "turma_horario_editado" | "credito_lancado" | "credito_retirado";
+            /** @description Nota interna, e só existe em ação administrativa que a exige. Consumo e devolução não têm motivo — o motivo deles é a própria reserva. */
+            motivo: Record<string, never> | null;
+            autor: components["schemas"]["AutorDoEventoDto"];
         };
         QuadraComHorarioProprioResponseDto: {
             /** Format: uuid */
@@ -1913,6 +1976,10 @@ export interface components {
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
             valor: number | null;
+            /** @example Maria */
+            criadaPor: string | null;
+            /** @example Gabriel */
+            canceladaPor: string | null;
         };
         ImagemDaQuadraResponseDto: {
             imagemUrl: string | null;
@@ -3772,7 +3839,12 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "pendente_pagamento" | "pago" | "cancelado";
-                /** @description Exclui ocupações canceladas. Pode ser combinado com `status` — os dois viram um `AND`, então `status=pago&excluirCanceladas=true` devolve só as pagas. */
+                /** @description Separa por horário, comparando o FIM da ocupação com o agora no fuso do clube. Omitido, devolve tudo (comportamento e ordem de hoje). */
+                quando?: "futuras" | "anteriores";
+                /**
+                 * @deprecated
+                 * @description DEPRECIADO (SPEC-041/D5) — desde a SPEC-041 o app mostra as canceladas marcadas em vez de escondê-las; use `status` para filtrar. Mantido só pela janela de skew entre os deploys do Back e do Cliente. Exclui ocupações canceladas. Pode ser combinado com `status` — os dois viram um `AND`, então `status=pago&excluirCanceladas=true` devolve só as pagas.
+                 */
                 excluirCanceladas?: boolean;
                 data?: string;
                 page?: number;
@@ -3835,6 +3907,27 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    BookingsController_eventos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoDeOcupacaoResponseDto"][];
+                };
             };
         };
     };
