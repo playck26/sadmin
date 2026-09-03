@@ -1886,8 +1886,32 @@ export interface components {
         ReservasCriadasResponseDto: {
             reservas: components["schemas"]["OcupacaoResponseDto"][];
         };
+        ItemDaListaDeReservasDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** Format: uuid */
+            quadraId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            /** Format: uuid */
+            alunoId: string | null;
+            /** @enum {string} */
+            statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
+            /** @example 120 */
+            valor: number | null;
+            /** @description Foi quem está pedindo que cancelou? `true` = eu, `false` = outra pessoa, `null` = não foi cancelada, não há evento registrado (anterior à SPEC-032), ou quem pede é o gestor. **Nunca traz nome, id ou objeto do autor** (INV-092). */
+            canceladaPorMim: boolean | null;
+        };
         OcupacaoPaginadaResponseDto: {
-            data: components["schemas"]["OcupacaoResponseDto"][];
+            data: components["schemas"]["ItemDaListaDeReservasDto"][];
             /** @example 1 */
             page: number;
             /** @example 20 */
