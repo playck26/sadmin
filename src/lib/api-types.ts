@@ -404,6 +404,86 @@ export interface paths {
         patch: operations["MeCadastroController_atualizarMeuCadastro"];
         trace?: never;
     };
+    "/api/v1/students/importar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ImportacaoController_importar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/planos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PlanosController_listar"];
+        put?: never;
+        post: operations["PlanosController_criar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/planos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["PlanosController_atualizar"];
+        trace?: never;
+    };
+    "/api/v1/students/{alunoId}/matriculas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MatriculasController_listar"];
+        put?: never;
+        post: operations["MatriculasController_criar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/matricula": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeMatriculaController_minhaMatricula"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/_smoke/tenant-check/{companyId}": {
         parameters: {
             query?: never;
@@ -1484,6 +1564,8 @@ export interface components {
             nome?: string;
             telefone?: string;
             nivelId?: string;
+            /** Format: uuid */
+            planoId?: string;
         };
         ConviteCriadoResponseDto: {
             /** Format: uuid */
@@ -1812,6 +1894,139 @@ export interface components {
             /** @enum {string|null} */
             uf?: "AC" | "AL" | "AP" | "AM" | "BA" | "CE" | "DF" | "ES" | "GO" | "MA" | "MT" | "MS" | "MG" | "PA" | "PB" | "PR" | "PE" | "PI" | "RJ" | "RN" | "RS" | "RO" | "RR" | "SC" | "SP" | "SE" | "TO" | null;
             observacoesSaude?: string | null;
+        };
+        ErroDeImportacaoDto: {
+            /** @example 47 */
+            linha: number;
+            /** @example email */
+            coluna: string;
+            /** @example Ja existe uma conta com este e-mail. */
+            mensagem: string;
+        };
+        LinhaValidaDto: {
+            /** @example 2 */
+            linha: number;
+            /** @example Ana Souza */
+            nome: string;
+            /** @example ana@clube.local */
+            email: string;
+            telefone: string | null;
+            /** Format: date-time */
+            dataNascimento: string | null;
+            emergenciaNome: string | null;
+            emergenciaTelefone: string | null;
+            /** Format: uuid */
+            nivelId: string | null;
+        };
+        RelatorioDeImportacaoDto: {
+            /**
+             * @description Linhas de aluno, sem o cabecalho.
+             * @example 300
+             */
+            total: number;
+            /** @example 298 */
+            validas: number;
+            erros: components["schemas"]["ErroDeImportacaoDto"][];
+            linhas: components["schemas"]["LinhaValidaDto"][];
+        };
+        AlunoImportadoDto: {
+            /** @example 2 */
+            linha: number;
+            /** Format: uuid */
+            alunoId: string;
+            /** @example ana@clube.local */
+            email: string;
+            /**
+             * @description Sai UMA VEZ. Nenhuma outra rota a devolve -- se o gestor perder, o caminho e regenerar.
+             * @example Kx7-mQ2p
+             */
+            senhaTemporaria: string;
+        };
+        ImportacaoConcluidaDto: {
+            criados: components["schemas"]["AlunoImportadoDto"][];
+        };
+        PlanoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Mensal */
+            nome: string;
+            /** @example 30000 */
+            valorCentavos: number;
+            /** @example 1 */
+            prazoMeses: number;
+            linkPagamentoUrl: string | null;
+            /** @example true */
+            linkHerdado: boolean;
+            /** @example true */
+            ativo: boolean;
+        };
+        CriarPlanoDto: {
+            /** @example Mensal */
+            nome: string;
+            /**
+             * @description Em CENTAVOS, como a carteira.
+             * @example 30000
+             */
+            valorCentavos: number;
+            /** @example 1 */
+            prazoMeses: number;
+            linkPagamentoUrl?: string | null;
+        };
+        AtualizarPlanoDto: {
+            nome?: string;
+            valorCentavos?: number;
+            prazoMeses?: number;
+            linkPagamentoUrl?: string | null;
+            ativo?: boolean;
+        };
+        MatriculaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            alunoId: string;
+            /** Format: uuid */
+            planoId: string;
+            /** @example Mensal */
+            planoNome: string | null;
+            /**
+             * @description O que foi ACERTADO, congelado.
+             * @example 25000
+             */
+            valorCentavos: number;
+            /**
+             * @description O que o plano cobrava NAQUELE DIA, congelado. Com os dois, o desconto fica visivel; com um so, ninguem distingue desconto de mudanca de preco depois.
+             * @example 30000
+             */
+            valorDeTabelaCentavos: number;
+            /**
+             * @description CALCULADO na leitura, nunca gravado. Uma coluna seria uma terceira verdade sobre os mesmos dois numeros -- e a primeira a divergir.
+             * @example 5000
+             */
+            descontoCentavos: number;
+            /** @example 1 */
+            prazoMeses: number;
+            /** @example 2026-09-10 */
+            inicio: string;
+            /**
+             * @description GRAVADO, nao derivado na leitura: "quem vence este mes" viraria varredura com aritmetica de data.
+             * @example 2026-10-10
+             */
+            fim: string;
+            /**
+             * @description A versao do contrato aceita. Exigida PELO BANCO (INV-114): matricula sem o aceite correspondente e recusada com `23503`.
+             * @example 3
+             */
+            contratoVersao: number;
+            /** @description Ja RESOLVIDO pela heranca: o do plano, ou o da empresa quando o plano nao tem proprio. */
+            linkPagamentoUrl: string | null;
+        };
+        CriarMatriculaDto: {
+            /** Format: uuid */
+            planoId: string;
+            /** @example 2026-09-10 */
+            inicio?: string;
+            /** @example 25000 */
+            valorCentavos?: number;
         };
         SmokeDeTenantResponseDto: {
             /** @example true */
@@ -3737,6 +3952,168 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AlunoResponseDto"];
+                };
+            };
+        };
+    };
+    ImportacaoController_importar: {
+        parameters: {
+            query: {
+                conferir: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    arquivo?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RelatorioDeImportacaoDto"] | components["schemas"]["ImportacaoConcluidaDto"];
+                };
+            };
+        };
+    };
+    PlanosController_listar: {
+        parameters: {
+            query: {
+                apenasAtivos: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanoResponseDto"][];
+                };
+            };
+        };
+    };
+    PlanosController_criar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriarPlanoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanoResponseDto"];
+                };
+            };
+        };
+    };
+    PlanosController_atualizar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AtualizarPlanoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanoResponseDto"];
+                };
+            };
+        };
+    };
+    MatriculasController_listar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alunoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaResponseDto"][];
+                };
+            };
+        };
+    };
+    MatriculasController_criar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alunoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriarMatriculaDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaResponseDto"];
+                };
+            };
+        };
+    };
+    MeMatriculaController_minhaMatricula: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaResponseDto"] | null;
                 };
             };
         };
