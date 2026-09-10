@@ -484,6 +484,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/matriculas/vencimentos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VencimentosController_vencimentos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/_smoke/tenant-check/{companyId}": {
         parameters: {
             query?: never;
@@ -2013,6 +2029,11 @@ export interface components {
              */
             fim: string;
             /**
+             * @description SPEC-045/AC-009 — dias ate o vencimento, **negativo quando ja venceu**. Calculado no servidor porque "hoje" da tela e o relogio do NAVEGADOR, que esta no fuso de quem viaja e nao no do clube. O comentario de `fim` acima ja previa esta spec: a coluna e gravada justamente para que "quem vence este mes" nao vire varredura.
+             * @example 5
+             */
+            diasRestantes: number;
+            /**
              * @description A versao do contrato aceita. Exigida PELO BANCO (INV-114): matricula sem o aceite correspondente e recusada com `23503`.
              * @example 3
              */
@@ -2027,6 +2048,33 @@ export interface components {
             inicio?: string;
             /** @example 25000 */
             valorCentavos?: number;
+        };
+        VencimentoResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Maria Silva */
+            alunoNome: string;
+            /** @example Mensal */
+            planoNome: string;
+            /**
+             * Format: date
+             * @example 2026-10-12
+             */
+            fim: string;
+            /**
+             * @description Dias ate o vencimento. **Negativo quando ja venceu** — e o mesmo campo, porque "vence em -3 dias" e "venceu ha 3 dias" sao a mesma informacao e dois campos divergiriam.
+             * @example 5
+             */
+            diasRestantes: number;
+        };
+        VencimentosResponseDto: {
+            /**
+             * @description A janela usada, ecoada: a tela nao precisa lembrar o padrao.
+             * @example 30
+             */
+            dias: number;
+            vencidas: components["schemas"]["VencimentoResponseDto"][];
+            vencendo: components["schemas"]["VencimentoResponseDto"][];
         };
         SmokeDeTenantResponseDto: {
             /** @example true */
@@ -4114,6 +4162,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MatriculaResponseDto"] | null;
+                };
+            };
+        };
+    };
+    VencimentosController_vencimentos: {
+        parameters: {
+            query?: {
+                dias?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VencimentosResponseDto"];
                 };
             };
         };
