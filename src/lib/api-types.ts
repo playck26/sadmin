@@ -340,6 +340,22 @@ export interface paths {
         patch: operations["TeachersController_update"];
         trace?: never;
     };
+    "/api/v1/me/professores": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeProfessoresController_listar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teachers/{id}/foto": {
         parameters: {
             query?: never;
@@ -1010,6 +1026,22 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["CourtCategoriesController_update"];
+        trace?: never;
+    };
+    "/api/v1/me/professores/{id}/horarios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeHorariosDeAulaController_listar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/students/{id}/creditos": {
@@ -1858,6 +1890,8 @@ export interface components {
             status: "ativo" | "inativo";
             /** Format: uuid */
             usuarioId: string | null;
+            /** @example 150 */
+            precoAula: number | null;
             fotoUrl: string | null;
             /** Format: date-time */
             createdAt: string;
@@ -1890,6 +1924,8 @@ export interface components {
             status: "ativo" | "inativo";
             /** Format: uuid */
             usuarioId: string | null;
+            /** @example 150 */
+            precoAula: number | null;
             fotoUrl: string | null;
             /** Format: date-time */
             createdAt: string;
@@ -1922,6 +1958,21 @@ export interface components {
             email?: string;
             /** @enum {string} */
             status?: "ativo" | "inativo";
+            /** @example 150 */
+            precoAula?: number | null;
+        };
+        ProfessorParaAlunoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Carlos Lima */
+            nome: string;
+            /** @description URL assinada, ou `null`. **Fail-soft**: chave corrompida vira `null` e linha no log, nunca erro na listagem (INV-034). */
+            fotoUrl: string | null;
+            /**
+             * @description Preco da aula em REAIS, ja resolvido (professor -> padrao do clube). Nunca nulo aqui: quem nao tem preco nao e listado (D2).
+             * @example 150
+             */
+            precoAula: number;
         };
         FotoDeProfessorResponseDto: {
             fotoUrl: string | null;
@@ -2289,6 +2340,8 @@ export interface components {
             prazoCancelamentoAulaHoras: number | null;
             /** @example 4 */
             prazoCancelamentoReservaHoras: number | null;
+            /** @example 150 */
+            precoAulaPadrao: number | null;
         };
         MinhaEmpresaResponseDto: {
             /** Format: uuid */
@@ -2582,6 +2635,11 @@ export interface components {
              * @example 4
              */
             prazoCancelamentoReservaHoras: number | null;
+            /**
+             * @description Preco padrao da aula particular, em reais. `null` = o clube nao vende aula particular pelo app.
+             * @example 150
+             */
+            precoAulaPadrao?: number | null;
         };
         DiaDaAgendaResponseDto: {
             /** @example 2026-09-01 */
@@ -2646,6 +2704,30 @@ export interface components {
              * @example 0
              */
             ordem?: number;
+        };
+        JanelaDoProfessorDto: {
+            /** @example 08:00 */
+            horaInicio: string;
+            /** @example 12:00 */
+            horaFim: string;
+        };
+        HorarioDeAulaDto: {
+            /** @example 09:00 */
+            horaInicio: string;
+            /** @example 10:00 */
+            horaFim: string;
+            quadraId: string;
+            /** @example Quadra 1 */
+            quadraNome: string;
+        };
+        HorariosDeAulaResponseDto: {
+            /** @example 2026-09-15 */
+            data: string;
+            atende: boolean;
+            janela: components["schemas"]["JanelaDoProfessorDto"] | null;
+            /** @example 150 */
+            precoAula: number;
+            slots: components["schemas"]["HorarioDeAulaDto"][];
         };
         MovimentoDeCreditoResponseDto: {
             id: string;
@@ -3967,6 +4049,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProfessorResponseDto"];
+                };
+            };
+        };
+    };
+    MeProfessoresController_listar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfessorParaAlunoResponseDto"][];
                 };
             };
         };
@@ -5434,6 +5535,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CatalogoDeQuadraResponseDto"];
+                };
+            };
+        };
+    };
+    MeHorariosDeAulaController_listar: {
+        parameters: {
+            query: {
+                data: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HorariosDeAulaResponseDto"];
                 };
             };
         };
