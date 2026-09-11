@@ -1428,6 +1428,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/reposicoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeReposicoesController_meuCredito"];
+        put?: never;
+        post: operations["MeReposicoesController_marcar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/reposicoes/oportunidades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeReposicoesController_oportunidades"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/reposicoes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["MeReposicoesController_desmarcar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dashboard/evasao": {
         parameters: {
             query?: never;
@@ -3077,6 +3125,7 @@ export interface components {
             /** @enum {string|null} */
             status: "presente" | "ausente" | "justificado" | null;
             naTurmaHoje: boolean;
+            reposicao: boolean;
             faltaAvisada: boolean;
         };
         ChamadaResponseDto: {
@@ -3152,6 +3201,101 @@ export interface components {
              * @enum {string|null}
              */
             chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | null;
+        };
+        ReposicaoMarcadaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Iniciante Terça */
+            turmaNome: string | null;
+            /**
+             * Format: date
+             * @example 2026-09-24
+             */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+        };
+        FaltaParaReporResponseDto: {
+            /** Format: uuid */
+            faltaId: string;
+            turmaNome: string | null;
+            /** Format: date */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
+            /**
+             * Format: date
+             * @description Ate quando da para repor esta falta (D6).
+             */
+            expiraEm: string;
+            /** @description Passou da validade — nao gera credito. */
+            expirada: boolean;
+            /** @description O CLUBE cancelou a aula. Nao gera credito porque o aluno nao perdeu nada (AC-003). */
+            aulaCancelada: boolean;
+            reposicao: components["schemas"]["ReposicaoMarcadaResponseDto"] | null;
+        };
+        CreditoDeReposicaoResponseDto: {
+            /**
+             * @description Faltas validas ainda nao repostas.
+             * @example 1
+             */
+            creditos: number;
+            /**
+             * @description Teto do clube, por mes da falta.
+             * @example 2
+             */
+            porMes: number;
+            /** @example 30 */
+            validadeDias: number;
+            /** @example 0 */
+            usadasNoMes: number;
+            faltas: components["schemas"]["FaltaParaReporResponseDto"][];
+        };
+        OportunidadeDeReposicaoResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: uuid */
+            turmaId: string;
+            /** @example Iniciante Quinta */
+            turmaNome: string;
+            /** @example Quadra 2 */
+            quadraNome: string;
+            /** Format: date */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
+            /** @example 2 */
+            vagas: number;
+        };
+        MarcarReposicaoDto: {
+            /**
+             * Format: uuid
+             * @description A falta que este gesto consome.
+             */
+            faltaId: string;
+            /**
+             * Format: uuid
+             * @description A ocorrencia que ele vai frequentar.
+             */
+            ocupacaoId: string;
+        };
+        ReposicaoCriadaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            faltaId: string;
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: date */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
         };
         AlunoEmEvasaoResponseDto: {
             /** Format: uuid */
@@ -6112,6 +6256,107 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AulaDoDiaDoProfessorDto"][];
                 };
+            };
+        };
+    };
+    MeReposicoesController_meuCredito: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditoDeReposicaoResponseDto"];
+                };
+            };
+        };
+    };
+    MeReposicoesController_marcar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarcarReposicaoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReposicaoCriadaResponseDto"];
+                };
+            };
+            /** @description Sem crédito (`SEM_CREDITO_DE_REPOSICAO`), falta já reposta (`FALTA_JA_REPOSTA`), aula cheia (`TURMA_SEM_VAGA`), teto do mês (`TETO_DE_REPOSICAO`), aula cancelada (`OCUPACAO_CANCELADA`) ou dentro do prazo (`PRAZO_DE_CANCELAMENTO`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Já matriculado na turma de destino (`JA_MATRICULADO_NA_TURMA`) ou turma fora de operação (`TURMA_INATIVA`). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeReposicoesController_oportunidades: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OportunidadeDeReposicaoResponseDto"][];
+                };
+            };
+        };
+    };
+    MeReposicoesController_desmarcar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dentro do prazo de antecedência (`PRAZO_DE_CANCELAMENTO`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
