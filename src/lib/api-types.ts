@@ -3436,6 +3436,33 @@ export interface components {
             /** @enum {string} */
             status: "pago" | "cancelado";
         };
+        OcupacaoComDevolucaoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** Format: uuid */
+            quadraId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            /** Format: uuid */
+            alunoId: string | null;
+            /** @enum {string} */
+            statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
+            /** @example 120 */
+            valor: number | null;
+            /**
+             * @description Centavos devolvidos à carteira do aluno neste cancelamento, ou null quando não havia consumo ativo (e sempre null ao marcar como pago).
+             * @example 12000
+             */
+            creditoDevolvidoCentavos: number | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -6608,7 +6635,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OcupacaoResponseDto"];
+                    "application/json": components["schemas"]["OcupacaoComDevolucaoResponseDto"];
                 };
             };
         };
