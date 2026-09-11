@@ -308,6 +308,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/teachers/{id}/disponibilidade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TeachersController_lerDisponibilidade"];
+        put: operations["TeachersController_definirDisponibilidade"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/teachers/{id}": {
         parameters: {
             query?: never;
@@ -370,6 +386,118 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["LevelsController_update"];
+        trace?: never;
+    };
+    "/api/v1/me/cadastro": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeCadastroController_meuCadastro"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["MeCadastroController_atualizarMeuCadastro"];
+        trace?: never;
+    };
+    "/api/v1/students/importar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ImportacaoController_importar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/planos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PlanosController_listar"];
+        put?: never;
+        post: operations["PlanosController_criar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/planos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["PlanosController_atualizar"];
+        trace?: never;
+    };
+    "/api/v1/students/{alunoId}/matriculas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MatriculasController_listar"];
+        put?: never;
+        post: operations["MatriculasController_criar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/matricula": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeMatriculaController_minhaMatricula"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matriculas/vencimentos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["VencimentosController_vencimentos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/_smoke/tenant-check/{companyId}": {
@@ -884,6 +1012,38 @@ export interface paths {
         patch: operations["CourtCategoriesController_update"];
         trace?: never;
     };
+    "/api/v1/students/{id}/creditos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CreditosController_extrato"];
+        put?: never;
+        post: operations["CreditosController_lancar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/creditos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeCreditosController_minhaCarteira"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/classes/{id}/avaliacoes": {
         parameters: {
             query?: never;
@@ -980,6 +1140,22 @@ export interface paths {
         patch: operations["ClassesController_update"];
         trace?: never;
     };
+    "/api/v1/classes/{id}/ocorrencias-canceladas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClassesController_ocorrenciasCanceladas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/classes/{turmaId}/ocorrencias/{ocupacaoId}/cancel": {
         parameters: {
             query?: never;
@@ -990,6 +1166,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["ClassesController_cancelarOcorrencia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/classes/{turmaId}/ocorrencias/{ocupacaoId}/reactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ClassesController_reativarOcorrencia"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1236,6 +1428,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/reposicoes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeReposicoesController_meuCredito"];
+        put?: never;
+        post: operations["MeReposicoesController_marcar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/reposicoes/oportunidades": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeReposicoesController_oportunidades"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/reposicoes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["MeReposicoesController_desmarcar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dashboard/evasao": {
         parameters: {
             query?: never;
@@ -1388,6 +1628,8 @@ export interface components {
             nome?: string;
             telefone?: string;
             nivelId?: string;
+            /** Format: uuid */
+            planoId?: string;
         };
         ConviteCriadoResponseDto: {
             /** Format: uuid */
@@ -1500,6 +1742,21 @@ export interface components {
             porTurma: components["schemas"]["FrequenciaPorTurmaResponseDto"][];
             ocorrencias: components["schemas"]["OcorrenciaDoAlunoResponseDto"][];
         };
+        CompletudeDoCadastroDto: {
+            /**
+             * @description Fracao dos SETE campos contaveis, arredondada. O piso real e 29% -- `nome` e `email` sao NOT NULL em `usuarios`, entao todo aluno nasce com dois. Barra em zero mentiria sobre o trabalho ja feito.
+             * @example 71
+             */
+            percentual: number;
+            /**
+             * @description Os que faltam, NA ORDEM EM QUE A TELA DEVE PEDI-LOS. Vazio quando `percentual` e 100.
+             * @example [
+             *       "dataNascimento",
+             *       "emergenciaTelefone"
+             *     ]
+             */
+            faltam: string[];
+        };
         AlunoResponseDto: {
             /** Format: uuid */
             id: string;
@@ -1513,6 +1770,19 @@ export interface components {
             nivelId: string | null;
             /** @enum {string} */
             status: "ativo" | "inativo";
+            /** @example 1990-05-10 */
+            dataNascimento: string | null;
+            /** @example Beto Souza */
+            emergenciaNome: string | null;
+            /** @example +5511988887777 */
+            emergenciaTelefone: string | null;
+            endereco: string | null;
+            /** @example Sao Paulo */
+            cidade: string | null;
+            /** @example SP */
+            uf: string | null;
+            observacoesSaude: string | null;
+            cadastro: components["schemas"]["CompletudeDoCadastroDto"];
         };
         AlunoPaginadoResponseDto: {
             data: components["schemas"]["AlunoResponseDto"][];
@@ -1536,6 +1806,19 @@ export interface components {
             nivelId: string | null;
             /** @enum {string} */
             status: "ativo" | "inativo";
+            /** @example 1990-05-10 */
+            dataNascimento: string | null;
+            /** @example Beto Souza */
+            emergenciaNome: string | null;
+            /** @example +5511988887777 */
+            emergenciaTelefone: string | null;
+            endereco: string | null;
+            /** @example Sao Paulo */
+            cidade: string | null;
+            /** @example SP */
+            uf: string | null;
+            observacoesSaude: string | null;
+            cadastro: components["schemas"]["CompletudeDoCadastroDto"];
             /** @example Xk4p-9Qm2 */
             senhaTemporaria: string;
         };
@@ -1548,6 +1831,15 @@ export interface components {
         UpdateStudentDto: {
             nome?: string;
             telefone?: string;
+            /** @example 1990-05-10 */
+            dataNascimento?: string | null;
+            emergenciaNome?: string | null;
+            emergenciaTelefone?: string | null;
+            endereco?: string | null;
+            cidade?: string | null;
+            /** @enum {string|null} */
+            uf?: "AC" | "AL" | "AP" | "AM" | "BA" | "CE" | "DF" | "ES" | "GO" | "MA" | "MT" | "MS" | "MG" | "PA" | "PB" | "PR" | "PE" | "PI" | "RJ" | "RN" | "RS" | "RO" | "RR" | "SC" | "SP" | "SE" | "TO" | null;
+            observacoesSaude?: string | null;
             nivelId?: string;
             /** @enum {string} */
             status?: "ativo" | "inativo";
@@ -1604,6 +1896,26 @@ export interface components {
             /** @example Xk4p-9Qm2 */
             senhaTemporaria: string;
         };
+        DiaDisponibilidadeDto: {
+            diaSemana: number;
+            /** @example 08:00 */
+            horaInicio: string;
+            /** @example 12:00 */
+            horaFim: string;
+        };
+        DefinirDisponibilidadeDto: {
+            dias: components["schemas"]["DiaDisponibilidadeDto"][];
+        };
+        DiaDisponibilidadeResponseDto: {
+            /** @description 0 = domingo */
+            diaSemana: number;
+            /** @description true quando o professor não atende no dia */
+            indisponivel: boolean;
+            /** @example 08:00 */
+            horaInicio: string | null;
+            /** @example 12:00 */
+            horaFim: string | null;
+        };
         UpdateTeacherDto: {
             nome?: string;
             telefone?: string;
@@ -1633,6 +1945,184 @@ export interface components {
         UpdateLevelDto: {
             nome?: string;
             ordem?: number;
+        };
+        CamposDoCadastroDto: {
+            nome?: string;
+            telefone?: string;
+            /** @example 1990-05-10 */
+            dataNascimento?: string | null;
+            emergenciaNome?: string | null;
+            emergenciaTelefone?: string | null;
+            endereco?: string | null;
+            cidade?: string | null;
+            /** @enum {string|null} */
+            uf?: "AC" | "AL" | "AP" | "AM" | "BA" | "CE" | "DF" | "ES" | "GO" | "MA" | "MT" | "MS" | "MG" | "PA" | "PB" | "PR" | "PE" | "PI" | "RJ" | "RN" | "RS" | "RO" | "RR" | "SC" | "SP" | "SE" | "TO" | null;
+            observacoesSaude?: string | null;
+        };
+        ErroDeImportacaoDto: {
+            /** @example 47 */
+            linha: number;
+            /** @example email */
+            coluna: string;
+            /** @example Ja existe uma conta com este e-mail. */
+            mensagem: string;
+        };
+        LinhaValidaDto: {
+            /** @example 2 */
+            linha: number;
+            /** @example Ana Souza */
+            nome: string;
+            /** @example ana@clube.local */
+            email: string;
+            telefone: string | null;
+            /** Format: date-time */
+            dataNascimento: string | null;
+            emergenciaNome: string | null;
+            emergenciaTelefone: string | null;
+            /** Format: uuid */
+            nivelId: string | null;
+        };
+        RelatorioDeImportacaoDto: {
+            /**
+             * @description Linhas de aluno, sem o cabecalho.
+             * @example 300
+             */
+            total: number;
+            /** @example 298 */
+            validas: number;
+            erros: components["schemas"]["ErroDeImportacaoDto"][];
+            linhas: components["schemas"]["LinhaValidaDto"][];
+        };
+        AlunoImportadoDto: {
+            /** @example 2 */
+            linha: number;
+            /** Format: uuid */
+            alunoId: string;
+            /** @example ana@clube.local */
+            email: string;
+            /**
+             * @description Sai UMA VEZ. Nenhuma outra rota a devolve -- se o gestor perder, o caminho e regenerar.
+             * @example Kx7-mQ2p
+             */
+            senhaTemporaria: string;
+        };
+        ImportacaoConcluidaDto: {
+            criados: components["schemas"]["AlunoImportadoDto"][];
+        };
+        PlanoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Mensal */
+            nome: string;
+            /** @example 30000 */
+            valorCentavos: number;
+            /** @example 1 */
+            prazoMeses: number;
+            linkPagamentoUrl: string | null;
+            /** @example true */
+            linkHerdado: boolean;
+            /** @example true */
+            ativo: boolean;
+        };
+        CriarPlanoDto: {
+            /** @example Mensal */
+            nome: string;
+            /**
+             * @description Em CENTAVOS, como a carteira.
+             * @example 30000
+             */
+            valorCentavos: number;
+            /** @example 1 */
+            prazoMeses: number;
+            linkPagamentoUrl?: string | null;
+        };
+        AtualizarPlanoDto: {
+            nome?: string;
+            valorCentavos?: number;
+            prazoMeses?: number;
+            linkPagamentoUrl?: string | null;
+            ativo?: boolean;
+        };
+        MatriculaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            alunoId: string;
+            /** Format: uuid */
+            planoId: string;
+            /** @example Mensal */
+            planoNome: string | null;
+            /**
+             * @description O que foi ACERTADO, congelado.
+             * @example 25000
+             */
+            valorCentavos: number;
+            /**
+             * @description O que o plano cobrava NAQUELE DIA, congelado. Com os dois, o desconto fica visivel; com um so, ninguem distingue desconto de mudanca de preco depois.
+             * @example 30000
+             */
+            valorDeTabelaCentavos: number;
+            /**
+             * @description CALCULADO na leitura, nunca gravado. Uma coluna seria uma terceira verdade sobre os mesmos dois numeros -- e a primeira a divergir.
+             * @example 5000
+             */
+            descontoCentavos: number;
+            /** @example 1 */
+            prazoMeses: number;
+            /** @example 2026-09-10 */
+            inicio: string;
+            /**
+             * @description GRAVADO, nao derivado na leitura: "quem vence este mes" viraria varredura com aritmetica de data.
+             * @example 2026-10-10
+             */
+            fim: string;
+            /**
+             * @description SPEC-045/AC-009 — dias ate o vencimento, **negativo quando ja venceu**. Calculado no servidor porque "hoje" da tela e o relogio do NAVEGADOR, que esta no fuso de quem viaja e nao no do clube. O comentario de `fim` acima ja previa esta spec: a coluna e gravada justamente para que "quem vence este mes" nao vire varredura.
+             * @example 5
+             */
+            diasRestantes: number;
+            /**
+             * @description A versao do contrato aceita. Exigida PELO BANCO (INV-114): matricula sem o aceite correspondente e recusada com `23503`.
+             * @example 3
+             */
+            contratoVersao: number;
+            /** @description Ja RESOLVIDO pela heranca: o do plano, ou o da empresa quando o plano nao tem proprio. */
+            linkPagamentoUrl: string | null;
+        };
+        CriarMatriculaDto: {
+            /** Format: uuid */
+            planoId: string;
+            /** @example 2026-09-10 */
+            inicio?: string;
+            /** @example 25000 */
+            valorCentavos?: number;
+        };
+        VencimentoResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Maria Silva */
+            alunoNome: string;
+            /** @example Mensal */
+            planoNome: string;
+            /**
+             * Format: date
+             * @example 2026-10-12
+             */
+            fim: string;
+            /**
+             * @description Dias ate o vencimento. **Negativo quando ja venceu** — e o mesmo campo, porque "vence em -3 dias" e "venceu ha 3 dias" sao a mesma informacao e dois campos divergiriam.
+             * @example 5
+             */
+            diasRestantes: number;
+        };
+        VencimentosResponseDto: {
+            /**
+             * @description A janela usada, ecoada: a tela nao precisa lembrar o padrao.
+             * @example 30
+             */
+            dias: number;
+            vencidas: components["schemas"]["VencimentoResponseDto"][];
+            vencendo: components["schemas"]["VencimentoResponseDto"][];
         };
         SmokeDeTenantResponseDto: {
             /** @example true */
@@ -1962,6 +2452,9 @@ export interface components {
              */
             horaFim?: string;
             alunoId?: string;
+            professorId?: string;
+            /** @example 120 */
+            valor?: number;
         };
         OcupacaoResponseDto: {
             /** Format: uuid */
@@ -2039,6 +2532,13 @@ export interface components {
             /** Format: uuid */
             quadraId?: string;
         };
+        CancelamentoResponseDto: {
+            /**
+             * @description Centavos devolvidos à carteira do aluno, ou null quando não havia consumo ativo.
+             * @example 12000
+             */
+            creditoDevolvidoCentavos: number | null;
+        };
         AutorDoEventoDto: {
             /** Format: uuid */
             id: string;
@@ -2057,7 +2557,7 @@ export interface components {
              * @description O GESTO humano que provocou o evento.
              * @enum {string}
              */
-            acao: "reserva_criada" | "reserva_cancelada" | "reserva_movida" | "aula_cancelada" | "pagamento_confirmado" | "turma_criada" | "turma_horario_editado" | "credito_lancado" | "credito_retirado" | "turma_aluno_removido";
+            acao: "reserva_criada" | "reserva_cancelada" | "reserva_movida" | "aula_cancelada" | "pagamento_confirmado" | "turma_criada" | "turma_horario_editado" | "credito_lancado" | "credito_retirado" | "turma_aluno_removido" | "turma_inativada" | "turma_reativada" | "aula_reativada";
             /** @description Nota interna, e só existe em ação administrativa que a exige. Consumo e devolução não têm motivo — o motivo deles é a própria reserva. */
             motivo: Record<string, never> | null;
             autor: components["schemas"]["AutorDoEventoDto"];
@@ -2146,6 +2646,52 @@ export interface components {
              * @example 0
              */
             ordem?: number;
+        };
+        MovimentoDeCreditoResponseDto: {
+            id: string;
+            /** @enum {string} */
+            tipo: "entrada" | "retirada" | "consumo" | "devolucao";
+            /** @description Sempre positivo; o sinal vem do tipo (D3). */
+            valorCentavos: number;
+            /** @description Nota interna do clube. Presente só nos administrativos, e **omitido na visão do aluno** (AC-013). */
+            motivo: string | null;
+            ocupacaoId: string | null;
+            criadoEm: string;
+        };
+        ExtratoDeCreditoResponseDto: {
+            /** @description Derivado do ledger pela trigger (D1). Nunca escrito por serviço. */
+            saldoCentavos: number;
+            movimentos: components["schemas"]["MovimentoDeCreditoResponseDto"][];
+        };
+        LancarCreditoDto: {
+            /**
+             * @description Só os dois administrativos. `consumo` e `devolucao` nascem da reserva e do cancelamento, nunca de uma chamada humana.
+             * @enum {string}
+             */
+            tipo: "entrada" | "retirada";
+            /** @description Centavos inteiros, sempre positivos — o sinal vem do tipo (D3). "Entrada de −500" é impossível por construção. */
+            valorCentavos: number;
+            /** @description Obrigatório. É nota interna do clube — o aluno não vê (AC-013). */
+            motivo: string;
+            /** @description A senha de quem está logado, reconferida no ato (D6). Não é sessão elevada: cada lançamento pede de novo. */
+            senha: string;
+        };
+        MovimentoCriadoResponseDto: {
+            movimentoId: string;
+            saldoCentavos: number;
+        };
+        MovimentoDoAlunoResponseDto: {
+            id: string;
+            /** @enum {string} */
+            tipo: "entrada" | "retirada" | "consumo" | "devolucao";
+            /** @description Sempre positivo; o sinal vem do tipo (D3). */
+            valorCentavos: number;
+            ocupacaoId: string | null;
+            criadoEm: string;
+        };
+        ExtratoDoAlunoResponseDto: {
+            saldoCentavos: number;
+            movimentos: components["schemas"]["MovimentoDoAlunoResponseDto"][];
         };
         AvaliacaoParaOGestorDto: {
             /** @example Ana Souza */
@@ -2325,6 +2871,23 @@ export interface components {
             /** @example 4 */
             alunosAlocados: number;
             alunos: components["schemas"]["AlunoDaTurmaResponseDto"][];
+        };
+        AulaCanceladaResponseDto: {
+            /**
+             * Format: uuid
+             * @description O MESMO id que `POST /classes/:turmaId/ocorrencias/:ocupacaoId/reactivate` aceita — se divergirem, o caminho quebra no último passo (mesma razão da INV-026b).
+             */
+            ocupacaoId: string;
+            /** @example 2026-09-22 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @example Quadra 1 */
+            quadraNome: string;
+            /** @description `false` quando outra ocupação já tomou o horário. A tela avisa antes; quem decide é o servidor. */
+            horarioLivre: boolean;
         };
         CancelarOcorrenciaDto: {
             /** @example Quadra interditada para manutenção */
@@ -2562,6 +3125,7 @@ export interface components {
             /** @enum {string|null} */
             status: "presente" | "ausente" | "justificado" | null;
             naTurmaHoje: boolean;
+            reposicao: boolean;
             faltaAvisada: boolean;
         };
         ChamadaResponseDto: {
@@ -2610,7 +3174,7 @@ export interface components {
              */
             aulas: number;
             /**
-             * @description Quantas ainda sem chamada registrada. É esta contagem que faz o calendário valer: a grade ele já conhece de cabeça; o que falta registrar, não.
+             * @description Quantas ainda sem chamada registrada. É esta contagem que faz o calendário valer: a grade ele já conhece de cabeça; o que falta registrar, não. **Aula particular nunca entra aqui** (SPEC-039/LIM-039a), mas conta em `aulas`.
              * @example 1
              */
             pendentes: number;
@@ -2621,6 +3185,8 @@ export interface components {
              * @description O MESMO id que `PUT /me/teacher/attendance/:ocupacaoId` aceita (INV-026b). Se divergirem, o caminho quebra no último passo.
              */
             ocupacaoId: string;
+            /** @enum {string} */
+            tipo: "turma" | "particular";
             /** Format: uuid */
             turmaId: string | null;
             turmaNome: string | null;
@@ -2631,10 +3197,105 @@ export interface components {
             /** @example 19:00 */
             horaFim: string;
             /**
-             * @description `futura` = ainda não começou; a chamada **não** pode ser lançada. `em_andamento` = começou e não terminou; pode lançar, e não é pendência. `pendente` = já terminou e não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030); **não** é pendência e não pinta o ponto vermelho. `cancelada` não aparece aqui: o filtro do calendário a exclui antes.
-             * @enum {string}
+             * @description `futura` = ainda não começou; a chamada **não** pode ser lançada. `em_andamento` = começou e não terminou; pode lançar, e não é pendência. `pendente` = já terminou e não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030); **não** é pendência e não pinta o ponto vermelho. `cancelada` não aparece aqui: o filtro do calendário a exclui antes. **`null` na aula PARTICULAR** (SPEC-039/LIM-039a): ela não tem chamada, e resolver um estado ali pintaria `pendente` numa aula que nunca poderá receber uma — ponto vermelho que o professor não limpa.
+             * @enum {string|null}
              */
-            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve";
+            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | null;
+        };
+        ReposicaoMarcadaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Iniciante Terça */
+            turmaNome: string | null;
+            /**
+             * Format: date
+             * @example 2026-09-24
+             */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+        };
+        FaltaParaReporResponseDto: {
+            /** Format: uuid */
+            faltaId: string;
+            turmaNome: string | null;
+            /** Format: date */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
+            /**
+             * Format: date
+             * @description Ate quando da para repor esta falta (D6).
+             */
+            expiraEm: string;
+            /** @description Passou da validade — nao gera credito. */
+            expirada: boolean;
+            /** @description O CLUBE cancelou a aula. Nao gera credito porque o aluno nao perdeu nada (AC-003). */
+            aulaCancelada: boolean;
+            reposicao: components["schemas"]["ReposicaoMarcadaResponseDto"] | null;
+        };
+        CreditoDeReposicaoResponseDto: {
+            /**
+             * @description Faltas validas ainda nao repostas.
+             * @example 1
+             */
+            creditos: number;
+            /**
+             * @description Teto do clube, por mes da falta.
+             * @example 2
+             */
+            porMes: number;
+            /** @example 30 */
+            validadeDias: number;
+            /** @example 0 */
+            usadasNoMes: number;
+            faltas: components["schemas"]["FaltaParaReporResponseDto"][];
+        };
+        OportunidadeDeReposicaoResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: uuid */
+            turmaId: string;
+            /** @example Iniciante Quinta */
+            turmaNome: string;
+            /** @example Quadra 2 */
+            quadraNome: string;
+            /** Format: date */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
+            /** @example 2 */
+            vagas: number;
+        };
+        MarcarReposicaoDto: {
+            /**
+             * Format: uuid
+             * @description A falta que este gesto consome.
+             */
+            faltaId: string;
+            /**
+             * Format: uuid
+             * @description A ocorrencia que ele vai frequentar.
+             */
+            ocupacaoId: string;
+        };
+        ReposicaoCriadaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            faltaId: string;
+            /** Format: uuid */
+            ocupacaoId: string;
+            /** Format: date */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
         };
         AlunoEmEvasaoResponseDto: {
             /** Format: uuid */
@@ -3218,6 +3879,52 @@ export interface operations {
             };
         };
     };
+    TeachersController_lerDisponibilidade: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiaDisponibilidadeResponseDto"][];
+                };
+            };
+        };
+    };
+    TeachersController_definirDisponibilidade: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DefinirDisponibilidadeDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiaDisponibilidadeResponseDto"][];
+                };
+            };
+        };
+    };
     TeachersController_findOne: {
         parameters: {
             query?: never;
@@ -3395,6 +4102,231 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["NivelResponseDto"];
+                };
+            };
+        };
+    };
+    MeCadastroController_meuCadastro: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlunoResponseDto"];
+                };
+            };
+        };
+    };
+    MeCadastroController_atualizarMeuCadastro: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CamposDoCadastroDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlunoResponseDto"];
+                };
+            };
+        };
+    };
+    ImportacaoController_importar: {
+        parameters: {
+            query: {
+                conferir: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    arquivo?: string;
+                };
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RelatorioDeImportacaoDto"] | components["schemas"]["ImportacaoConcluidaDto"];
+                };
+            };
+        };
+    };
+    PlanosController_listar: {
+        parameters: {
+            query: {
+                apenasAtivos: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanoResponseDto"][];
+                };
+            };
+        };
+    };
+    PlanosController_criar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriarPlanoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanoResponseDto"];
+                };
+            };
+        };
+    };
+    PlanosController_atualizar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AtualizarPlanoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlanoResponseDto"];
+                };
+            };
+        };
+    };
+    MatriculasController_listar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alunoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaResponseDto"][];
+                };
+            };
+        };
+    };
+    MatriculasController_criar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alunoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriarMatriculaDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaResponseDto"];
+                };
+            };
+        };
+    };
+    MeMatriculaController_minhaMatricula: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatriculaResponseDto"] | null;
+                };
+            };
+        };
+    };
+    VencimentosController_vencimentos: {
+        parameters: {
+            query?: {
+                dias?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VencimentosResponseDto"];
                 };
             };
         };
@@ -4099,11 +5031,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            204: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CancelamentoResponseDto"];
+                };
             };
         };
     };
@@ -4504,6 +5438,71 @@ export interface operations {
             };
         };
     };
+    CreditosController_extrato: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExtratoDeCreditoResponseDto"];
+                };
+            };
+        };
+    };
+    CreditosController_lancar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LancarCreditoDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MovimentoCriadoResponseDto"];
+                };
+            };
+        };
+    };
+    MeCreditosController_minhaCarteira: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExtratoDoAlunoResponseDto"];
+                };
+            };
+        };
+    };
     ClassesController_avaliacoesDaTurma: {
         parameters: {
             query?: never;
@@ -4691,7 +5690,52 @@ export interface operations {
             };
         };
     };
+    ClassesController_ocorrenciasCanceladas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AulaCanceladaResponseDto"][];
+                };
+            };
+        };
+    };
     ClassesController_cancelarOcorrencia: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                turmaId: string;
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelarOcorrenciaDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ClassesController_reativarOcorrencia: {
         parameters: {
             query?: never;
             header?: never;
@@ -5212,6 +6256,107 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AulaDoDiaDoProfessorDto"][];
                 };
+            };
+        };
+    };
+    MeReposicoesController_meuCredito: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreditoDeReposicaoResponseDto"];
+                };
+            };
+        };
+    };
+    MeReposicoesController_marcar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarcarReposicaoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReposicaoCriadaResponseDto"];
+                };
+            };
+            /** @description Sem crédito (`SEM_CREDITO_DE_REPOSICAO`), falta já reposta (`FALTA_JA_REPOSTA`), aula cheia (`TURMA_SEM_VAGA`), teto do mês (`TETO_DE_REPOSICAO`), aula cancelada (`OCUPACAO_CANCELADA`) ou dentro do prazo (`PRAZO_DE_CANCELAMENTO`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Já matriculado na turma de destino (`JA_MATRICULADO_NA_TURMA`) ou turma fora de operação (`TURMA_INATIVA`). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeReposicoesController_oportunidades: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OportunidadeDeReposicaoResponseDto"][];
+                };
+            };
+        };
+    };
+    MeReposicoesController_desmarcar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dentro do prazo de antecedência (`PRAZO_DE_CANCELAMENTO`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
