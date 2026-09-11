@@ -3746,6 +3746,8 @@ export interface operations {
                 page?: number;
                 pageSize?: number;
                 vinculo?: "pendente" | "aprovado" | "recusado";
+                /** @description Filtra por nome do aluno. Vários termos combinam com AND, em qualquer ordem. Não ignora acento (LIM-049a). */
+                busca?: string;
             };
             header?: never;
             path?: never;
