@@ -63,6 +63,40 @@ page.tsx (server component, fino)
 
 **Nada de global.** É o app mais simples: uma listagem e dois formulários.
 
+**PWA (SPEC-050) — passou a existir neste ciclo.** A ADR-012 sempre disse que
+`cliente` **e `admin` (e `sadmin`)** seriam PWA instalável, e por mais de um mês
+só o `cliente` era: `super.playck.com.br/manifest.webmanifest` respondia **404**, sem
+service worker e sem ícone de instalação. Não era decisão revista — era ADR
+descumprida, e ninguém tinha rodado o `curl`.
+
+Agora há `app/manifest.ts`, `public/sw.js`, `register-service-worker.tsx` e
+`convite-de-instalacao.tsx`, com a decisão em `lib/instalacao-pwa.ts`. Três
+pontos não óbvios, cada um com teste:
+
+1. **O evento é capturado antes da hidratação** — um `<Script
+   strategy="beforeInteractive">` no `layout.tsx` guarda o
+   `beforeinstallprompt`, porque o Chrome o dispara logo após o `load`,
+   normalmente antes de um `useEffect` assinar.
+2. **Dois modos** — `botao` no Chromium (diálogo nativo) e `instrucao` no iOS,
+   onde o evento não existe. A detecção testa `Macintosh` + `maxTouchPoints > 1`,
+   porque o iPad se anuncia como Mac desde o iPadOS 13.
+3. **Dispensar vale 15 dias** (`playck_instalacao_dispensada_em`), e a chave
+   **não** leva o prefixo `playck_sadmin_` de propósito: aquelas saem no
+   `clearAccessToken()`, e dispensa que morre no logout faz o convite voltar a
+   cada sessão.
+
+**Sem `orientation` no manifest**, ao contrário do `cliente` (que trava em
+`portrait`): este é o painel interno da PlayCK, usado de mesa. Aqui o ganho de instalar é
+menor que nos outros dois, e o convite existe porque a ADR-012 inclui o
+`sadmin` e porque três cópias iguais são mais baratas de manter que duas mais
+uma exceção — a exceção é o que envelhece sem ninguém notar, como este próprio
+404 envelheceu.
+
+**Os ícones são gerados, não editados** — `harness/pwa/gerar-icones.mjs` (raiz
+da governança) refaz os 15 arquivos dos 3 apps a partir de
+`public/playck-logo.png`, achatando o alfa e gerando o par `maskable`. Os
+ícones antigos deste repo eram o logo **com canal alfa**: fundo preto no iOS.
+
 ## 5. Camada de API — a regra que mais importa
 
 Todo acesso autenticado passa por **`authFetch`** (`lib/api-client.ts`), que
