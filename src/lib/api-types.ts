@@ -3256,6 +3256,16 @@ export interface components {
              */
             aulas: number;
             /**
+             * @description Quantas das `aulas` são aula de TURMA. `aulas = turmas + particulares` (SPEC-052/INV-129).
+             * @example 1
+             */
+            turmas: number;
+            /**
+             * @description Quantas das `aulas` são aula PARTICULAR (SPEC-039). `aulas = turmas + particulares` (SPEC-052/INV-129).
+             * @example 1
+             */
+            particulares: number;
+            /**
              * @description Quantas ainda sem chamada registrada. É esta contagem que faz o calendário valer: a grade ele já conhece de cabeça; o que falta registrar, não. **Aula particular nunca entra aqui** (SPEC-039/LIM-039a), mas conta em `aulas`.
              * @example 1
              */
@@ -6108,6 +6118,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["MediaDaTurmaResponseDto"];
                 };
+            };
+            /** @description Papel diferente de `aluno` — inclusive `professor` (SPEC-052/D6). */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Turma inexistente ou de outra empresa — as duas respondem igual. */
             404: {
