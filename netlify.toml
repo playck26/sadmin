@@ -1,0 +1,11 @@
+# Só o que muda o build fica aqui. Comando de build, diretório publicado e
+# variáveis continuam no painel da Netlify.
+#
+# Cada deploy de produção custa 15 créditos. O `ignore` cancela o build quando
+# o commit não muda o site publicado (só documentação, testes, `api-types.ts`,
+# CI): exit 0 pula, exit 1 constrói. Na dúvida, constrói.
+#
+# Mudou este arquivo ou uma variável no painel? Use "Trigger deploy": com o
+# mesmo commit, o script sempre constrói.
+[build]
+  ignore = "node scripts/netlify-ignore.mjs"
