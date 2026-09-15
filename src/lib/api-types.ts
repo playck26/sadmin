@@ -3400,6 +3400,8 @@ export interface components {
             nivelNome: string | null;
             capacidade: number;
             totalAlunos: number;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
         };
         AlunoDoProfessorResponseDto: {
             /** Format: uuid */
@@ -3416,6 +3418,8 @@ export interface components {
             nivelNome: string | null;
             capacidade: number;
             alunos: components["schemas"]["AlunoDoProfessorResponseDto"][];
+            /** @enum {string} */
+            status: "ativa" | "inativa";
         };
         OcorrenciaDaTurmaResponseDto: {
             /** Format: uuid */
@@ -6805,7 +6809,10 @@ export interface operations {
     };
     MeTeacherClassesController_minhasTurmas: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Inclui as turmas INATIVAS do professor com alguma aula nos últimos 90 dias ou no futuro (SPEC-056/D2). Sem o parâmetro, só as ativas. */
+                incluirInativas?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
