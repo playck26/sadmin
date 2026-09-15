@@ -2645,6 +2645,8 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             /** Format: uuid */
             alunoId: string | null;
+            /** @example Ana Souza */
+            alunoNome: string | null;
             /** @enum {string} */
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
@@ -2671,6 +2673,8 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             /** Format: uuid */
             alunoId: string | null;
+            /** @example Ana Souza */
+            alunoNome: string | null;
             /** @enum {string} */
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
@@ -3708,6 +3712,8 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             /** Format: uuid */
             alunoId: string | null;
+            /** @example Ana Souza */
+            alunoNome: string | null;
             /** @enum {string} */
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
@@ -4029,6 +4035,8 @@ export interface operations {
                 page?: number;
                 pageSize?: number;
                 vinculo?: "pendente" | "aprovado" | "recusado";
+                /** @description Filtra por nome do aluno. Vários termos combinam com AND, em qualquer ordem. Não ignora acento (LIM-049a). */
+                busca?: string;
             };
             header?: never;
             path?: never;
