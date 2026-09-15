@@ -900,6 +900,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/company-settings/nomes-de-tipo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["CompanySettingsController_definirNomesDeTipo"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/agenda": {
         parameters: {
             query?: never;
@@ -1042,6 +1058,86 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tipos-de-adicional": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TiposDeAdicionalController_listar"];
+        put?: never;
+        post: operations["TiposDeAdicionalController_criar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tipos-de-adicional/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["TiposDeAdicionalController_apagar"];
+        options?: never;
+        head?: never;
+        patch: operations["TiposDeAdicionalController_renomear"];
+        trace?: never;
+    };
+    "/api/v1/adicionais/disponiveis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdicionaisController_disponiveis"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/adicionais": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AdicionaisController_listar"];
+        put?: never;
+        post: operations["AdicionaisController_criar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/adicionais/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["AdicionaisController_editar"];
         trace?: never;
     };
     "/api/v1/students/{id}/creditos": {
@@ -2335,13 +2431,17 @@ export interface components {
             nome: string;
             logoUrl: string | null;
         };
-        ConfigOperacaoResponseDto: {
+        ConfigOperacaoComNomesResponseDto: {
             /** @example 2 */
             prazoCancelamentoAulaHoras: number | null;
             /** @example 4 */
             prazoCancelamentoReservaHoras: number | null;
             /** @example 150 */
             precoAulaPadrao: number | null;
+            /** @example Quadra */
+            nomeTipoQuadra: string;
+            /** @example Aula particular */
+            nomeTipoAula: string;
         };
         MinhaEmpresaResponseDto: {
             /** Format: uuid */
@@ -2489,6 +2589,11 @@ export interface components {
             /** @example 10:00 */
             horaFim: string;
         };
+        AdicionalDoPedidoDto: {
+            adicionalId: string;
+            /** @example 2 */
+            quantidade: number;
+        };
         CreateBookingDto: {
             quadraId: string;
             /** @example 2026-08-20 */
@@ -2508,6 +2613,20 @@ export interface components {
             professorId?: string;
             /** @example 120 */
             valor?: number;
+            adicionais?: components["schemas"]["AdicionalDoPedidoDto"][];
+        };
+        AdicionalDaReservaDto: {
+            /** Format: uuid */
+            adicionalId: string;
+            /** @example Raquete Wilson */
+            nome: string;
+            /** @example 2 */
+            quantidade: number;
+            /**
+             * @description Em reais.
+             * @example 15
+             */
+            valorUnitario: number;
         };
         OcupacaoResponseDto: {
             /** Format: uuid */
@@ -2530,6 +2649,7 @@ export interface components {
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
             valor: number | null;
+            adicionais: components["schemas"]["AdicionalDaReservaDto"][];
         };
         ReservasCriadasResponseDto: {
             reservas: components["schemas"]["OcupacaoResponseDto"][];
@@ -2555,6 +2675,7 @@ export interface components {
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
             valor: number | null;
+            adicionais: components["schemas"]["AdicionalDaReservaDto"][];
             /** @description Foi quem está pedindo que cancelou? `true` = eu, `false` = outra pessoa, `null` = não foi cancelada, não há evento registrado (anterior à SPEC-032), ou quem pede é o gestor. **Nunca traz nome, id ou objeto do autor** (INV-092). */
             canceladaPorMim: boolean | null;
         };
@@ -2624,6 +2745,12 @@ export interface components {
             padrao: components["schemas"]["DiaDeHorarioResponseDto"][];
             quadrasComHorarioProprio: components["schemas"]["QuadraComHorarioProprioResponseDto"][];
         };
+        DefinirNomesDeTipoDto: {
+            /** @example Espaço */
+            nomeTipoQuadra: string | null;
+            /** @example null */
+            nomeTipoAula: string | null;
+        };
         DefinirConfigOperacaoDto: {
             /**
              * @description Com quantas horas de antecedência o aluno pode sair de uma aula. `null` = sem antecedência mínima. **Não é "sem limite"**: depois que a aula começou ninguém cancela, nem com `null` (D5b).
@@ -2640,6 +2767,14 @@ export interface components {
              * @example 150
              */
             precoAulaPadrao?: number | null;
+        };
+        ConfigOperacaoResponseDto: {
+            /** @example 2 */
+            prazoCancelamentoAulaHoras: number | null;
+            /** @example 4 */
+            prazoCancelamentoReservaHoras: number | null;
+            /** @example 150 */
+            precoAulaPadrao: number | null;
         };
         DiaDaAgendaResponseDto: {
             /** @example 2026-09-01 */
@@ -2674,6 +2809,7 @@ export interface components {
             criadaPor: string | null;
             /** @example Gabriel */
             canceladaPor: string | null;
+            adicionais: components["schemas"]["AdicionalDaReservaDto"][];
         };
         DiaComItensResponseDto: {
             /** @example 2026-09-06 */
@@ -2728,6 +2864,115 @@ export interface components {
             /** @example 150 */
             precoAula: number;
             slots: components["schemas"]["HorarioDeAulaDto"][];
+        };
+        TipoDeAdicionalResponseDto: {
+            id: string;
+            /** @example Raquetes */
+            nome: string;
+            /** @example 0 */
+            ordem: number;
+        };
+        CriarTipoDeAdicionalDto: {
+            /** @example Raquetes */
+            nome: string;
+            /**
+             * @description Ordena na tela. Default 0.
+             * @example 0
+             */
+            ordem?: number;
+        };
+        EditarTipoDeAdicionalDto: {
+            /** @example Raquetes */
+            nome?: string;
+            /** @example 0 */
+            ordem?: number;
+        };
+        AdicionalDisponivelResponseDto: {
+            id: string;
+            tipoId: string;
+            /** @example Raquetes */
+            tipoNome: string;
+            /** @example Raquete Wilson */
+            nome: string;
+            /**
+             * @description Em reais.
+             * @example 15
+             */
+            preco: number;
+            /**
+             * @description O MENOR saldo entre os blocos do pedido — o quanto o `POST /bookings` aceitaria agora. Nunca negativo.
+             * @example 2
+             */
+            disponivel: number;
+        };
+        AdicionalResponseDto: {
+            id: string;
+            tipoId: string;
+            /** @example Raquetes */
+            tipoNome: string;
+            /** @example Raquete Wilson */
+            nome: string;
+            /**
+             * @description Em reais.
+             * @example 15
+             */
+            preco: number;
+            /** @example 4 */
+            estoque: number;
+            /** @example true */
+            ativo: boolean;
+        };
+        CriarAdicionalDto: {
+            tipoId: string;
+            /** @example Raquete Wilson */
+            nome: string;
+            /** @example 15 */
+            preco: number;
+            /** @example 4 */
+            estoque: number;
+        };
+        EditarAdicionalDto: {
+            tipoId?: string;
+            /** @example Raquete Wilson */
+            nome?: string;
+            /** @example 15 */
+            preco?: number;
+            /** @example 3 */
+            estoque?: number;
+            /** @example true */
+            ativo?: boolean;
+        };
+        HorarioAcimaDoEstoqueDto: {
+            /** @example 2026-10-01 */
+            data: string;
+            /** @example 09:00 */
+            horaInicio: string;
+            /** @example 10:00 */
+            horaFim: string;
+            /**
+             * @description Unidades reservadas que se sobrepõem a este horário.
+             * @example 4
+             */
+            reservado: number;
+        };
+        AdicionalEditadoResponseDto: {
+            id: string;
+            tipoId: string;
+            /** @example Raquetes */
+            tipoNome: string;
+            /** @example Raquete Wilson */
+            nome: string;
+            /**
+             * @description Em reais.
+             * @example 15
+             */
+            preco: number;
+            /** @example 4 */
+            estoque: number;
+            /** @example true */
+            ativo: boolean;
+            /** @description D13 — reservas futuras, não canceladas, em que a soma sobreposta passou do estoque novo. Vazio quando nada ficou acima. */
+            horariosAcimaDoEstoque: components["schemas"]["HorarioAcimaDoEstoqueDto"][];
         };
         MovimentoDeCreditoResponseDto: {
             id: string;
@@ -3256,6 +3501,16 @@ export interface components {
              */
             aulas: number;
             /**
+             * @description Quantas das `aulas` são aula de TURMA. `aulas = turmas + particulares` (SPEC-052/INV-129).
+             * @example 1
+             */
+            turmas: number;
+            /**
+             * @description Quantas das `aulas` são aula PARTICULAR (SPEC-039). `aulas = turmas + particulares` (SPEC-052/INV-129).
+             * @example 1
+             */
+            particulares: number;
+            /**
              * @description Quantas ainda sem chamada registrada. É esta contagem que faz o calendário valer: a grade ele já conhece de cabeça; o que falta registrar, não. **Aula particular nunca entra aqui** (SPEC-039/LIM-039a), mas conta em `aulas`.
              * @example 1
              */
@@ -3435,6 +3690,34 @@ export interface components {
         UpdatePaymentStatusDto: {
             /** @enum {string} */
             status: "pago" | "cancelado";
+        };
+        OcupacaoComDevolucaoResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** Format: uuid */
+            quadraId: string;
+            /** @example 2026-09-01 */
+            data: string;
+            /** @example 18:00 */
+            horaInicio: string;
+            /** @example 19:00 */
+            horaFim: string;
+            /** @enum {string} */
+            origemTipo: "AVULSO" | "TURMA";
+            /** Format: uuid */
+            alunoId: string | null;
+            /** @enum {string} */
+            statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
+            /** @example 120 */
+            valor: number | null;
+            adicionais: components["schemas"]["AdicionalDaReservaDto"][];
+            /**
+             * @description Centavos devolvidos à carteira do aluno neste cancelamento, ou null quando não havia consumo ativo (e sempre null ao marcar como pago).
+             * @example 12000
+             */
+            creditoDevolvidoCentavos: number | null;
         };
     };
     responses: never;
@@ -4763,7 +5046,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConfigOperacaoResponseDto"];
+                    "application/json": components["schemas"]["ConfigOperacaoComNomesResponseDto"];
                 };
             };
         };
@@ -5221,7 +5504,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConfigOperacaoResponseDto"];
+                    "application/json": components["schemas"]["ConfigOperacaoComNomesResponseDto"];
                 };
             };
         };
@@ -5246,6 +5529,36 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ConfigOperacaoResponseDto"];
                 };
+            };
+        };
+    };
+    CompanySettingsController_definirNomesDeTipo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DefinirNomesDeTipoDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfigOperacaoComNomesResponseDto"];
+                };
+            };
+            /** @description campo ausente ou inválido, ou `VALOR_INVALIDO` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -5561,6 +5874,274 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HorariosDeAulaResponseDto"];
                 };
+            };
+        };
+    };
+    TiposDeAdicionalController_listar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TipoDeAdicionalResponseDto"][];
+                };
+            };
+        };
+    };
+    TiposDeAdicionalController_criar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriarTipoDeAdicionalDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TipoDeAdicionalResponseDto"];
+                };
+            };
+            /** @description validação, ou `VALOR_INVALIDO` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `TIPO_JA_EXISTE` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TiposDeAdicionalController_apagar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `TIPO_NAO_ENCONTRADO` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `TIPO_EM_USO`, com `adicionais`: a contagem */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TiposDeAdicionalController_renomear: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditarTipoDeAdicionalDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TipoDeAdicionalResponseDto"];
+                };
+            };
+            /** @description validação, ou `VALOR_INVALIDO` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `TIPO_NAO_ENCONTRADO` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `TIPO_JA_EXISTE` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdicionaisController_disponiveis: {
+        parameters: {
+            query: {
+                /** @description AAAA-MM-DD */
+                data: string;
+                /** @description Os horários do pedido, `HH:mm-HH:mm` separados por vírgula. Horários contíguos viram um bloco, como no `POST /bookings`. */
+                slots: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdicionalDisponivelResponseDto"][];
+                };
+            };
+        };
+    };
+    AdicionaisController_listar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdicionalResponseDto"][];
+                };
+            };
+        };
+    };
+    AdicionaisController_criar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CriarAdicionalDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdicionalResponseDto"];
+                };
+            };
+            /** @description validação, ou `VALOR_INVALIDO` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `TIPO_NAO_ENCONTRADO` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `ADICIONAL_JA_EXISTE` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdicionaisController_editar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EditarAdicionalDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdicionalEditadoResponseDto"];
+                };
+            };
+            /** @description validação, ou `VALOR_INVALIDO` */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `ADICIONAL_NAO_ENCONTRADO` ou `TIPO_NAO_ENCONTRADO` */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `ADICIONAL_JA_EXISTE` */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -6083,6 +6664,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["MediaDaTurmaResponseDto"];
                 };
+            };
+            /** @description Papel diferente de `aluno` — inclusive `professor` (SPEC-052/D6). */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Turma inexistente ou de outra empresa — as duas respondem igual. */
             404: {
@@ -6610,7 +7198,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OcupacaoResponseDto"];
+                    "application/json": components["schemas"]["OcupacaoComDevolucaoResponseDto"];
                 };
             };
         };
