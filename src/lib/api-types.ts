@@ -2645,6 +2645,8 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             /** Format: uuid */
             alunoId: string | null;
+            /** @example Ana Souza */
+            alunoNome: string | null;
             /** @enum {string} */
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
@@ -2671,6 +2673,8 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             /** Format: uuid */
             alunoId: string | null;
+            /** @example Ana Souza */
+            alunoNome: string | null;
             /** @enum {string} */
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
@@ -3708,6 +3712,8 @@ export interface components {
             origemTipo: "AVULSO" | "TURMA";
             /** Format: uuid */
             alunoId: string | null;
+            /** @example Ana Souza */
+            alunoNome: string | null;
             /** @enum {string} */
             statusPagamento: "pendente_pagamento" | "pago" | "cancelado";
             /** @example 120 */
