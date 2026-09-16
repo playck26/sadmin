@@ -6852,10 +6852,11 @@ export interface operations {
     };
     MeTeacherAttendanceController_ocorrencias: {
         parameters: {
-            query: {
-                dias: number;
+            query?: {
                 page?: number;
                 pageSize?: number;
+                /** @description Janela de histórico em dias, contada para trás a partir de hoje. Cortada em 90 pelo servidor. */
+                dias?: number;
             };
             header?: never;
             path: {
