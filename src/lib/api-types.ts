@@ -3303,6 +3303,10 @@ export interface components {
              * @enum {string|null}
              */
             motivo?: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | null;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @example Iniciante */
+            nivelNome: string | null;
             encontros: components["schemas"]["EncontroDaTurmaDisponivelDto"][];
         };
         MatriculaDoAlunoResponseDto: {
@@ -3605,6 +3609,10 @@ export interface components {
             turmaId: string;
             /** @example Iniciante Quinta */
             turmaNome: string;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @example Iniciante */
+            nivelNome: string | null;
             /** @example Quadra 2 */
             quadraNome: string;
             /** Format: date */
@@ -4041,6 +4049,8 @@ export interface operations {
                 vinculo?: "pendente" | "aprovado" | "recusado";
                 /** @description Filtra por nome do aluno. Vários termos combinam com AND, em qualquer ordem. Não ignora acento (LIM-049a). */
                 busca?: string;
+                nivelId?: string;
+                semNivel?: boolean;
             };
             header?: never;
             path?: never;
