@@ -1412,22 +1412,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/me/classes/{id}/avaliacao": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["MeClassesController_mediaDaTurma"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/me/classes/aulas/{ocupacaoId}/avaliacao": {
         parameters: {
             query?: never;
@@ -3442,18 +3426,6 @@ export interface components {
             pageSize: number;
             /** @example 37 */
             total: number;
-        };
-        MediaDaTurmaResponseDto: {
-            /**
-             * @description null quando ainda não há nenhuma avaliação. Uma casa decimal: a tela desenha estrelas, e precisão maior seria falsa.
-             * @example 4.3
-             */
-            media: number | null;
-            /**
-             * @description Quantas avaliações compõem a média. A tela mostra ao lado dela — média sem o tamanho da amostra faz 5,0 de uma nota parecer 5,0 de vinte.
-             * @example 7
-             */
-            quantidade: number;
         };
         AvaliarAulaDto: {
             /**
@@ -6794,41 +6766,6 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AulasAnterioresPaginadasResponseDto"];
                 };
-            };
-        };
-    };
-    MeClassesController_mediaDaTurma: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MediaDaTurmaResponseDto"];
-                };
-            };
-            /** @description Papel diferente de `aluno` — inclusive `professor` (SPEC-052/D6). */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Turma inexistente ou de outra empresa — as duas respondem igual. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
