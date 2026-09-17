@@ -948,6 +948,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/agenda/ocorrencias/{ocupacaoId}/visitantes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AgendaController_visitantes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/agenda/{data}": {
         parameters: {
             query?: never;
@@ -1371,7 +1387,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["MeClassesController_minhaTurma"];
         put?: never;
         post: operations["MeClassesController_entrar"];
         delete: operations["MeClassesController_sair"];
@@ -2491,6 +2507,13 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             imagemUrl: string | null;
+            /**
+             * @example #00763A
+             * @enum {string}
+             */
+            cor: "#00763A" | "#31658C" | "#A23B1E" | "#6B46A3" | "#8B5E00" | "#A12B65";
+            /** @example 12 */
+            codigoAgenda: string;
         };
         QuadraPaginadaResponseDto: {
             data: components["schemas"]["QuadraResponseDto"][];
@@ -2514,6 +2537,11 @@ export interface components {
              */
             categoriaId?: string;
             precoHora: number;
+            /**
+             * @description Ausente: usa o padrão #00763A.
+             * @enum {string}
+             */
+            cor?: "#00763A" | "#31658C" | "#A23B1E" | "#6B46A3" | "#8B5E00" | "#A12B65";
         };
         UpdateCourtDto: {
             nome?: string;
@@ -2524,6 +2552,11 @@ export interface components {
             precoHora?: number;
             /** @enum {string} */
             status?: "ativa" | "inativa";
+            /**
+             * @description Ausente: preserva a cor atual. null é recusado.
+             * @enum {string}
+             */
+            cor?: "#00763A" | "#31658C" | "#A23B1E" | "#6B46A3" | "#8B5E00" | "#A12B65";
         };
         SlotDeDisponibilidadeResponseDto: {
             /** @example 18:00-19:00 */
@@ -2814,12 +2847,44 @@ export interface components {
             /** @example Gabriel */
             canceladaPor: string | null;
             adicionais: components["schemas"]["AdicionalDaReservaDto"][];
+            /** @enum {string} */
+            quadraCor: "#00763A" | "#31658C" | "#A23B1E" | "#6B46A3" | "#8B5E00" | "#A12B65";
+            /** @example 12 */
+            quadraCodigoAgenda: string;
+            /** @enum {string} */
+            tipoVisual: "TURMA" | "AVULSO" | "PARTICULAR";
+            /** @example 8 */
+            capacidade: number | null;
+            /** @example 8 */
+            matriculados: number | null;
+            /** @example 1 */
+            faltasAvisadas: number | null;
+            /** @example 2 */
+            reposicoesMarcadas: number | null;
+            /** @example 2 */
+            reposicoesNaOcupacao: number | null;
+            /** @example 9 */
+            ocupados: number | null;
+            /** @example 0 */
+            vagasNaOcorrencia: number | null;
         };
         DiaComItensResponseDto: {
             /** @example 2026-09-06 */
             data: string;
             fechado: boolean;
             itens: components["schemas"]["ItemDaAgendaResponseDto"][];
+        };
+        VisitanteDaOcorrenciaResponseDto: {
+            /** Format: uuid */
+            alunoId: string;
+            /** @example Ana Souza */
+            nome: string;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @example Intermediário */
+            nivelNome: string | null;
+            /** @enum {string} */
+            tipo: "reposicao";
         };
         ImagemDaQuadraResponseDto: {
             imagemUrl: string | null;
@@ -3303,6 +3368,10 @@ export interface components {
              * @enum {string|null}
              */
             motivo?: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | null;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @example Iniciante */
+            nivelNome: string | null;
             encontros: components["schemas"]["EncontroDaTurmaDisponivelDto"][];
         };
         MatriculaDoAlunoResponseDto: {
@@ -3325,6 +3394,25 @@ export interface components {
             message: string;
             /** @example 2 */
             horasExigidas?: number;
+        };
+        ColegaDeTurmaResponseDto: {
+            /** @example João Silva */
+            nome: string;
+            nivelNome: string | null;
+            souEu: boolean;
+        };
+        TurmaDoAlunoDetalheResponseDto: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            capacidade: number;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            quadraNome: string;
+            nivelNome: string | null;
+            professorNome: string | null;
+            colegas: components["schemas"]["ColegaDeTurmaResponseDto"][];
         };
         AulaAnteriorResponseDto: {
             /** Format: uuid */
@@ -3605,6 +3693,10 @@ export interface components {
             turmaId: string;
             /** @example Iniciante Quinta */
             turmaNome: string;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** @example Iniciante */
+            nivelNome: string | null;
             /** @example Quadra 2 */
             quadraNome: string;
             /** Format: date */
@@ -4041,6 +4133,8 @@ export interface operations {
                 vinculo?: "pendente" | "aprovado" | "recusado";
                 /** @description Filtra por nome do aluno. Vários termos combinam com AND, em qualquer ordem. Não ignora acento (LIM-049a). */
                 busca?: string;
+                nivelId?: string;
+                semNivel?: boolean;
             };
             header?: never;
             path?: never;
@@ -5616,6 +5710,27 @@ export interface operations {
             };
         };
     };
+    AgendaController_visitantes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VisitanteDaOcorrenciaResponseDto"][];
+                };
+            };
+        };
+    };
     AgendaController_dia: {
         parameters: {
             query?: never;
@@ -6520,7 +6635,12 @@ export interface operations {
     };
     MeClassesController_myUpcomingClasses: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description AAAA-MM-DD */
+                de?: string;
+                /** @description AAAA-MM-DD */
+                ate?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -6552,6 +6672,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TurmaDisponivelResponseDto"][];
+                };
+            };
+        };
+    };
+    MeClassesController_minhaTurma: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurmaDoAlunoDetalheResponseDto"];
                 };
             };
         };
