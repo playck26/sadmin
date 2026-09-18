@@ -2831,6 +2831,21 @@ export interface components {
             total: number;
             /** @example 3 */
             pendentes: number;
+            /**
+             * @description Ocupações de TURMA.
+             * @example 5
+             */
+            turmas: number;
+            /**
+             * @description Reservas AVULSAS com professor (aula particular).
+             * @example 2
+             */
+            particulares: number;
+            /**
+             * @description Reservas AVULSAS sem professor (a quadra pela quadra).
+             * @example 5
+             */
+            quadras: number;
             fechado: boolean;
         };
         ItemDaAgendaResponseDto: {
