@@ -3639,6 +3639,18 @@ export interface components {
              * @enum {string|null}
              */
             chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | null;
+            /**
+             * @description Quantos avisaram falta nesta aula.
+             * @example 2
+             */
+            faltasAvisadas: number;
+            /**
+             * @example [
+             *       "Ana Lima",
+             *       "Bruno Sá"
+             *     ]
+             */
+            quemAvisou: string[];
         };
         ReposicaoMarcadaResponseDto: {
             /** Format: uuid */
