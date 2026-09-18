@@ -1854,6 +1854,7 @@ export interface components {
             /** @example Turma A */
             turmaNome: string | null;
             naTurmaHoje: boolean;
+            visitante: boolean;
             cobertura: components["schemas"]["CoberturaResponseDto"];
         };
         OcorrenciaDoAlunoResponseDto: {
@@ -3137,6 +3138,7 @@ export interface components {
             faltasSeguidasComposicao: components["schemas"]["FaltasSeguidasComposicaoResponseDto"];
             /** Format: uuid */
             alunoId: string;
+            visitante: boolean;
             /** @example Ana Souza */
             nome: string;
             naTurmaHoje: boolean;
@@ -3162,6 +3164,7 @@ export interface components {
             /** @enum {string} */
             status: "presente" | "ausente" | "justificado";
             naTurmaHoje: boolean;
+            reposicao: boolean;
             alunoAtivo: boolean;
         };
         OcorrenciaNoHistoricoResponseDto: {
