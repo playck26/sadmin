@@ -2717,6 +2717,15 @@ export interface components {
             adicionais: components["schemas"]["AdicionalDaReservaDto"][];
             /** @description Foi quem está pedindo que cancelou? `true` = eu, `false` = outra pessoa, `null` = não foi cancelada, não há evento registrado (anterior à SPEC-032), ou quem pede é o gestor. **Nunca traz nome, id ou objeto do autor** (INV-092). */
             canceladaPorMim: boolean | null;
+            /**
+             * @description `quadra` = a pessoa reservou a quadra. `aula_particular` = há professor atribuído (SPEC-039).
+             * @enum {string}
+             */
+            tipo: "quadra" | "aula_particular";
+            /** @example Marcos Lima */
+            professorNome: string | null;
+            /** @example Quadra 1 */
+            quadraNome: string;
         };
         OcupacaoPaginadaResponseDto: {
             data: components["schemas"]["ItemDaListaDeReservasDto"][];
@@ -5459,6 +5468,10 @@ export interface operations {
                 /** @description Instante que o servidor usou na 1ª página desta travessia. Reenviado nas seguintes para a fronteira não andar entre elas. Omitido = agora. */
                 referenciaTemporal?: string;
                 data?: string;
+                /** @description AAAA-MM-DD */
+                de?: string;
+                /** @description AAAA-MM-DD */
+                ate?: string;
                 page?: number;
                 pageSize?: number;
             };
