@@ -22,6 +22,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # SPEC-062/INV-062b — a chave privada VAPID nao alcanca o navegador.
+      # Roda ANTES do lint: se um segredo entrou, a formatacao do codigo
+      # e a ultima coisa que importa.
+      - run: node scripts/gates-de-push.mjs
+
       - run: pnpm run lint
 
       - run: pnpm run typecheck
