@@ -43,6 +43,13 @@ export const SEM_EFEITO_NO_SITE = [
   // CI e lint: rodam no GitHub, não entram no build.
   /^\.github\//,
   /^eslint\.config\.[cm]?js$/,
+  // Gates de segredo (SPEC-062/TASK-006): rodam no `lint:ci`, e o `next build`
+  // nunca os importa. **Custou 45 créditos descobrir isto** — os três merges
+  // dos gates em 2026-09-19 tocavam só `.github/workflows/ci.yml` (que a lista
+  // conhecia) e este arquivo (que ela não conhecia), e os três construíram.
+  // A lista é nomeada uma a uma de propósito: `^scripts/` inteiro seria a
+  // aposta errada no dia em que um script virar passo de build.
+  /^scripts\/gates-de-push\.mjs$/,
   // Esta própria regra. Mudar a configuração de build exige *Trigger deploy*.
   /^netlify\.toml$/,
   /^scripts\/netlify-ignore\.mjs$/,
