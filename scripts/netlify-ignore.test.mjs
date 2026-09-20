@@ -23,6 +23,7 @@ describe("semEfeitoNoSite", () => {
     "eslint.config.mjs",
     "netlify.toml",
     "scripts/netlify-ignore.mjs",
+    "scripts/gates-de-push.mjs",
   ])("%s não muda o site", (arquivo) => {
     expect(semEfeitoNoSite(arquivo)).toBe(true);
   });
@@ -72,6 +73,22 @@ describe("decidir", () => {
     });
     expect(r.pular).toBe(false);
     expect(r.arquivos).toEqual(["src/components/x.tsx"]);
+  });
+
+  /**
+   * **O caso real que custou 45 créditos.** Em 2026-09-19 os três frontends
+   * mergearam os gates de segredo da SPEC-062/TASK-006 tocando exatamente
+   * estes dois arquivos, e os três construíram: a lista conhecia o `.github/`
+   * e não conhecia o `gates-de-push.mjs`. A regra estava certa; a lista é que
+   * estava incompleta. Este teste existe para que a lista não volte a ficar.
+   */
+  it("merge só dos gates de push: pula — foi o que falhou em 2026-09-19", () => {
+    const r = decidir({
+      anterior: "6ef1de4",
+      atual: "1644364",
+      listar: comArquivos([".github/workflows/ci.yml", "scripts/gates-de-push.mjs"]),
+    });
+    expect(r.pular).toBe(true);
   });
 
   it("mesmo commit (Trigger deploy manual): constrói — é a saída para forçar", () => {
