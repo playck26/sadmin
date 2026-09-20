@@ -66,7 +66,17 @@ function reprovar(gate, detalhe) {
 // G1 — o nome, em qualquer arquivo rastreado
 // ---------------------------------------------------------------------------
 {
-  const achado = grepAchou(["-I", "-n", "-E", "PUSH_VAPID", "--", "."]);
+  // **Este arquivo se exclui, e a razao e boba mas real:** ele contem a
+  // string que procura, no proprio padrao. Sem a exclusao o G1 reprova a si
+  // mesmo -- e passou local porque `git grep` so ve o indice, e o arquivo
+  // ainda nao estava rastreado quando rodei.
+  //
+  // O buraco que isso abriria esta fechado pelo G4, que varre `scripts/`
+  // procurando literal com FORMA de chave: escrever um segredo aqui dentro
+  // continua reprovando.
+  const achado = grepAchou([
+    "-I", "-n", "-E", "PUSH_VAPID", "--", ".", ":!scripts/gates-de-push.mjs",
+  ]);
   if (achado) {
     reprovar(
       "G1",
@@ -141,7 +151,9 @@ function reprovar(gate, detalhe) {
 // não a ocultação deliberada — e nunca imprime o conteúdo do que acha.
 // ---------------------------------------------------------------------------
 {
-  const arquivos = git(["ls-files", "--", "src", "next.config.*"])
+  // `scripts` entra aqui de proposito: o G1 se exclui, e e o G4 que impede
+  // alguem de esconder um segredo justamente no arquivo que o G1 nao le.
+  const arquivos = git(["ls-files", "--", "src", "next.config.*", "scripts"])
     .split("\n")
     .filter((f) => /\.(ts|tsx|js|jsx|mjs|cjs|json)$/.test(f));
 
