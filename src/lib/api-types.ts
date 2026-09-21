@@ -1380,6 +1380,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/classes/proximas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeClassesController_proximas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/classes/{id}": {
         parameters: {
             query?: never;
@@ -1682,6 +1698,166 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["PaymentStatusController_updateStatus"];
+        trace?: never;
+    };
+    "/api/v1/push/chave-publica": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PushPublicoController_chavePublica"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/push/assinatura": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PushController_assinar"];
+        delete: operations["PushController_desassinar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/push/teste": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["PushController_teste"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/avisos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeAvisosController_listar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/avisos/nao-lidos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeAvisosController_naoLidos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/avisos/lidas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeAvisosController_marcarLidas"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/fila-de-espera/turmas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeFilaDeEsperaController_entrarNaTurma"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/fila-de-espera/aulas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeFilaDeEsperaController_entrarNaAula"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/fila-de-espera/{id}/confirmar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeFilaDeEsperaController_confirmar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/fila-de-espera/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["MeFilaDeEsperaController_sair"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -3406,6 +3582,15 @@ export interface components {
             nivelNome: string | null;
             encontros: components["schemas"]["EncontroDaTurmaDisponivelDto"][];
         };
+        AulasProximasPaginadasResponseDto: {
+            data: components["schemas"]["AulaDoAlunoResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 10 */
+            pageSize: number;
+            /** @example 43 */
+            total: number;
+        };
         MatriculaDoAlunoResponseDto: {
             /** Format: uuid */
             id: string;
@@ -3426,25 +3611,6 @@ export interface components {
             message: string;
             /** @example 2 */
             horasExigidas?: number;
-        };
-        ColegaDeTurmaResponseDto: {
-            /** @example João Silva */
-            nome: string;
-            nivelNome: string | null;
-            souEu: boolean;
-        };
-        TurmaDoAlunoDetalheResponseDto: {
-            /** Format: uuid */
-            id: string;
-            nome: string;
-            /** @enum {string} */
-            status: "ativa" | "inativa";
-            capacidade: number;
-            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
-            quadraNome: string;
-            nivelNome: string | null;
-            professorNome: string | null;
-            colegas: components["schemas"]["ColegaDeTurmaResponseDto"][];
         };
         AulaAnteriorResponseDto: {
             /** Format: uuid */
@@ -3474,6 +3640,25 @@ export interface components {
             pageSize: number;
             /** @example 37 */
             total: number;
+        };
+        ColegaDeTurmaResponseDto: {
+            /** @example João Silva */
+            nome: string;
+            nivelNome: string | null;
+            souEu: boolean;
+        };
+        TurmaDoAlunoDetalheResponseDto: {
+            /** Format: uuid */
+            id: string;
+            nome: string;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            capacidade: number;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            quadraNome: string;
+            nivelNome: string | null;
+            professorNome: string | null;
+            colegas: components["schemas"]["ColegaDeTurmaResponseDto"][];
         };
         AvaliarAulaDto: {
             /**
@@ -3862,6 +4047,122 @@ export interface components {
              * @example 12000
              */
             creditoDevolvidoCentavos: number | null;
+        };
+        ChavePublicaResponseDto: {
+            /** @description A chave pública VAPID, em base64url. */
+            chave: string;
+            /** @description `sha256` do texto da chave privada, em hexadecimal. Não é segredo: é o insumo do gate que procura a chave no bundle publicado. */
+            impressaoDaPrivada: string;
+        };
+        AssinaturaPushDto: {
+            /** @description O `endpoint` emitido pelo serviço de push do navegador. CREDENCIAL: não é devolvido por nenhuma rota. */
+            endpoint: string;
+            /** @description Chave pública do aparelho. CREDENCIAL. */
+            p256dh: string;
+            /** @description Segredo de autenticação do aparelho. CREDENCIAL. */
+            auth: string;
+        };
+        DesassinarPushDto: {
+            /** @description O `endpoint` a remover DESTA conta. */
+            endpoint: string;
+        };
+        TesteEnfileiradoResponseDto: {
+            /** @description Sempre `true`. A linha entrou na caixa de saída; o envio é do tick, e aceitação pelo serviço de push não é entrega. */
+            enfileirada: boolean;
+        };
+        AvisoDaCaixaResponseDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000001 */
+            id: string;
+            /**
+             * @description Vocabulário fechado nos avisos de gesto (SPEC-063/D4): `Reservas`, `Sua aula`, `Sua turma`. O aviso de teste usa `Avisos do clube`.
+             * @example Sua aula
+             */
+            titulo: string;
+            /** @example Sua aula de quinta (19h) foi cancelada */
+            corpo: string;
+            /**
+             * @description Para onde o toque leva. Carrega **id**, nunca slug de texto livre (SPEC-063/AC-007).
+             * @example /minhas-aulas
+             */
+            destinoUrl: string | null;
+            /**
+             * Format: date-time
+             * @example 2026-09-20T12:31:00.000Z
+             */
+            criadaEm: string;
+            /**
+             * @description `null` enquanto não lida. **"Lido" é do servidor** (SPEC-065/D2): vale em todo aparelho da mesma conta.
+             * @example null
+             */
+            lidaEm: string | null;
+        };
+        CaixaDeAvisosResponseDto: {
+            data: components["schemas"]["AvisoDaCaixaResponseDto"][];
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+            /** @example 37 */
+            total: number;
+            /**
+             * @description Quantos ainda não foram lidos. **Não conta `tipo='teste'`** (SPEC-065/AC-008): o aviso de teste é diagnóstico do canal, não recado do clube.
+             * @example 3
+             */
+            naoLidos: number;
+        };
+        NaoLidosResponseDto: {
+            /** @example 3 */
+            naoLidos: number;
+        };
+        MarcadasResponseDto: {
+            /** @example 3 */
+            marcadas: number;
+        };
+        EntrarNaFilaDeTurmaDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000001 */
+            turmaId: string;
+        };
+        LinhaDaFilaResponseDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000003 */
+            id: string;
+            /**
+             * @description Nasce sempre `aguardando`. Quem muda para `chamado` é o varredor (SPEC-064/D3), nunca esta rota.
+             * @example aguardando
+             */
+            estado: string;
+            /**
+             * @description Fila de turma. Exclusivo com `ocupacaoId`.
+             * @example 5f7c1e2a-0000-4000-8000-000000000001
+             */
+            turmaId: string | null;
+            /**
+             * @description Fila de aula. Exclusivo com `turmaId`.
+             * @example null
+             */
+            ocupacaoId: string | null;
+            /**
+             * @description O crédito que sustenta a fila de aula. `null` na fila de turma — e vira `null` se a falta for apagada (a FK anula só esta coluna).
+             * @example null
+             */
+            faltaId: string | null;
+            /** @example 2026-09-20T12:31:00.000Z */
+            criadaEm: string;
+        };
+        EntrarNaFilaDeAulaDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000002 */
+            ocupacaoId: string;
+        };
+        ConfirmacaoDaVezResponseDto: {
+            /**
+             * @description `turma` = virou matrícula; `aula` = virou reposição.
+             * @example aula
+             */
+            fila: string;
+            /**
+             * @description A reposição criada, na fila de aula. `null` na fila de turma, que gera matrícula e não reposição.
+             * @example 5f7c1e2a-0000-4000-8000-000000000004
+             */
+            reposicaoId: string | null;
         };
     };
     responses: never;
@@ -6722,6 +7023,28 @@ export interface operations {
             };
         };
     };
+    MeClassesController_proximas: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AulasProximasPaginadasResponseDto"];
+                };
+            };
+        };
+    };
     MeClassesController_minhaTurma: {
         parameters: {
             query?: never;
@@ -7366,6 +7689,304 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["OcupacaoComDevolucaoResponseDto"];
                 };
+            };
+        };
+    };
+    PushPublicoController_chavePublica: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChavePublicaResponseDto"];
+                };
+            };
+            /** @description `PUSH_NAO_CONFIGURADO` — falta par VAPID. Falha fechada: o serviço diz que não funciona em vez de fingir. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PushController_assinar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssinaturaPushDto"];
+            };
+        };
+        responses: {
+            /** @description Registrada. **Sem corpo de propósito** (INV-062f): não há o que devolver, e devolver a assinatura seria repetir a credencial que acabou de chegar. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `ENDPOINT_EM_USO` — o aparelho pertence a outra conta. A autenticação prova a conta, não o controle do aparelho. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `PUSH_NAO_CONFIGURADO`. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PushController_desassinar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DesassinarPushDto"];
+            };
+        };
+        responses: {
+            /** @description Removida, ou já não existia. A resposta é a mesma nos dois casos. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PushController_teste: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TesteEnfileiradoResponseDto"];
+                };
+            };
+            /** @description `TESTE_JA_ENFILEIRADO` (409, já há um a caminho) ou `TESTE_ACIMA_DO_TETO` (429, três na última hora). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description `PUSH_NAO_CONFIGURADO`. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeAvisosController_listar: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaixaDeAvisosResponseDto"];
+                };
+            };
+        };
+    };
+    MeAvisosController_naoLidos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NaoLidosResponseDto"];
+                };
+            };
+        };
+    };
+    MeAvisosController_marcarLidas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarcadasResponseDto"];
+                };
+            };
+        };
+    };
+    MeFilaDeEsperaController_entrarNaTurma: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntrarNaFilaDeTurmaDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinhaDaFilaResponseDto"];
+                };
+            };
+            /** @description Já está nesta fila (`JA_NA_FILA`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Turma fora de operação (`TURMA_INATIVA`) ou já matriculado nela (`JA_MATRICULADO_NA_TURMA`). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeFilaDeEsperaController_entrarNaAula: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntrarNaFilaDeAulaDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinhaDaFilaResponseDto"];
+                };
+            };
+            /** @description Já está nesta fila (`JA_NA_FILA`), sem crédito de reposição (`SEM_CREDITO`), aula cancelada (`OCUPACAO_CANCELADA`) ou já passada (`PRAZO_DE_CANCELAMENTO`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Já matriculado na turma da aula (`JA_MATRICULADO_NA_TURMA`). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeFilaDeEsperaController_confirmar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmacaoDaVezResponseDto"];
+                };
+            };
+            /** @description A vez nao esta aberta (`NAO_E_SUA_VEZ`), o prazo venceu (`VEZ_EXPIRADA`) ou a confirmacao foi recusada pelo gesto de destino (`TURMA_SEM_VAGA`, `TURMA_CHEIA`, `SEM_CREDITO_DE_REPOSICAO`, `TETO_DE_REPOSICAO`, ...). **Em todos, a linha fica encerrada.** */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MeFilaDeEsperaController_sair: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
