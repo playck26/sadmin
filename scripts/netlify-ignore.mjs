@@ -40,6 +40,11 @@ export const SEM_EFEITO_NO_SITE = [
   /^vitest\.(config|setup)\.[cm]?[jt]s$/,
   // Só tipos: `openapi-typescript` gera `interface` e `type`, nada que execute.
   /^src\/lib\/api-types\.ts$/,
+  // SPEC-067/TASK-001: o SHA do Back de que os tipos sairam. Lido so pelo job
+  // `contrato` do CI, nunca importado pelo site. **Sem esta linha a SPEC-067
+  // custaria 45 creditos** -- a v1 dela declarava "zero" sem ter conferido esta
+  // lista, e o proprio autor achou o erro na v2.
+  /^src\/lib\/contrato\.lock\.json$/,
   // CI e lint: rodam no GitHub, não entram no build.
   /^\.github\//,
   /^eslint\.config\.[cm]?js$/,

@@ -34,3 +34,48 @@ jobs:
       - run: pnpm run test
 
       - run: pnpm run build
+
+  # SPEC-067/TASK-001 — os tipos gerados correspondem ao contrato FIXADO?
+  #
+  # Job proprio, e nao um passo do `build`, porque e pelo NOME que o ruleset o
+  # exige (TASK-004): `contrato` vira `required_status_checks` ao lado de
+  # `build`. Enquanto isso nao acontecer, ele aparece na PR mas nao bloqueia --
+  # e a INV-067a fica declarada aberta, nao "mecanizada".
+  #
+  # O contrato vem do SHA em `src/lib/contrato.lock.json`, por `raw` imutavel.
+  # Merge no Back NAO deixa este job vermelho: quem acompanha o `main` do Back
+  # e o `contrato.yml` agendado, que abre PR em vez de reprovar a sua.
+  contrato:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # So para ter o `openapi-typescript` na versao do lockfile.
+      - run: pnpm install --frozen-lockfile
+
+      # O autoteste roda ANTES: se a comparacao estiver quebrada, o veredito
+      # sobre os tipos nao vale nada.
+      #
+      # **E os dois passos exigem a LINHA de sucesso, nao so o exit 0.** Ao
+      # replicar este gate para o Admin, uma conversao de caminho do Git Bash
+      # gravou o script com ZERO bytes -- e `node` num arquivo vazio sai 0. O
+      # gate ficou "verde" sem ter conferido nada, e so o tamanho do arquivo
+      # denunciou. Exit code sozinho nao prova que o gate rodou.
+      - name: autoteste do gate
+        run: |
+          saida="$(node .github/scripts/conferir-contrato.mjs --autoteste)"
+          echo "$saida"
+          echo "$saida" | grep -Eq '^autoteste: ([0-9]+) de \1$'
+
+      - name: tipos contra o contrato fixado
+        run: |
+          saida="$(node .github/scripts/conferir-contrato.mjs)"
+          echo "$saida"
+          echo "$saida" | grep -q '^OK src/lib/api-types.ts em dia'

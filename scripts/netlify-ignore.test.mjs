@@ -17,7 +17,9 @@ describe("semEfeitoNoSite", () => {
     "src/lib/api-client-adicionais.test.ts",
     "scripts/netlify-ignore.test.mjs",
     "src/lib/api-types.ts",
+    "src/lib/contrato.lock.json",
     ".github/workflows/ci.yml",
+    ".github/scripts/conferir-contrato.mjs",
     "vitest.config.mts",
     "vitest.setup.ts",
     "eslint.config.mjs",
@@ -89,6 +91,33 @@ describe("decidir", () => {
       listar: comArquivos([".github/workflows/ci.yml", "scripts/gates-de-push.mjs"]),
     });
     expect(r.pular).toBe(true);
+  });
+
+  it("SPEC-067/AC-011 — o merge do gate de contrato: pula", () => {
+    // Lock, gate e workflow. **Sem o padrao do lock, isto construia nos tres
+    // frontends: 45 creditos para uma mudanca que nao toca o site.**
+    const r = decidir({
+      anterior: "aaaaaaa",
+      atual: "bbbbbbb",
+      listar: comArquivos([
+        ".github/workflows/ci.yml",
+        ".github/scripts/conferir-contrato.mjs",
+        "scripts/netlify-ignore.mjs",
+        "src/lib/contrato.lock.json",
+      ]),
+    });
+    expect(r.pular).toBe(true);
+  });
+
+  it("SPEC-067 — lock junto com codigo de verdade: constrói", () => {
+    // O par negativo: o padrao novo nao pode virar passe livre para o commit
+    // que tambem mexe no site.
+    const r = decidir({
+      anterior: "aaaaaaa",
+      atual: "bbbbbbb",
+      listar: comArquivos(["src/lib/contrato.lock.json", "src/lib/api-client.ts"]),
+    });
+    expect(r.pular).toBe(false);
   });
 
   it("mesmo commit (Trigger deploy manual): constrói — é a saída para forçar", () => {
