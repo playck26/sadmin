@@ -20,7 +20,7 @@
  * Buscar o `main` do Back seria alvo móvel: 82 dos 277 commits dele em 30 dias
  * mexeram no contrato, e o CI deste repositório ficaria vermelho por merge
  * alheio. *"O contrato ainda é o atual?"* é outra pergunta, e quem a responde é
- * o `contrato.yml` agendado, que abre PR em vez de reprovar a sua.
+ * o `sincronizar-contrato.mjs`, agendado, que abre PR em vez de reprovar a sua.
  *
  * ## Não escreve no repositório
  *
@@ -28,34 +28,32 @@
  * gate que conserta o que confere deixa de ser gate. Este gera num diretório
  * temporário e compara.
  *
- * ## Mora em `.github/scripts/`, e isso é o custo de deploy
- *
- * `^\.github\/` está em `SEM_EFEITO_NO_SITE` (`scripts/netlify-ignore.mjs`).
- * Em `scripts/` ele faria cada mudança sua custar 15 créditos da Netlify.
- * **Arquivo idêntico em `cliente`, `admin` e `sadmin`** — o mesmo custo de
- * duplicação declarado do `netlify-ignore.mjs` (ADR-001).
- *
  * ## Saídas
  *
- *     0  em dia com o contrato fixado
+ *     0  em dia com o contrato fixado — e imprime `OK ... em dia`
  *     1  divergente (nomeia o arquivo e quantas linhas)
  *     2  a checagem não pôde ser feita — lock inválido, rede, JSON, gerador
  *
- * O `2` importa tanto quanto o `1` (INV-067b): um script que devolvesse `0` sem
- * conseguir conferir estaria afirmando que conferiu.
+ * O `2` importa tanto quanto o `1` (INV-067b). E o `0` sozinho não basta: o
+ * workflow exige a linha `OK ... em dia`, porque um script **vazio** também sai
+ * 0 — e isso aconteceu, ao replicar este arquivo com zero bytes.
  *
  * `--autoteste` roda os casos da comparação, sem rede.
  */
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-
-const LOCK = "src/lib/contrato.lock.json";
-const TIPOS = "src/lib/api-types.ts";
-const ORIGEM = (sha) =>
-  `https://raw.githubusercontent.com/playck26/back/${sha}/openapi.json`;
+import {
+  ORIGEM,
+  LOCK,
+  TIPOS,
+  baixarContrato,
+  caminhoDoGerador,
+  executar,
+  falhar,
+  lerLock,
+} from "./contrato-comum.mjs";
 
 /**
  * Final de linha NÃO é diferença de contrato. Com `core.autocrlf=true` a cópia
@@ -70,25 +68,6 @@ export function comparar(atual, gerado) {
   const a = atual.replace(/\r\n/g, "\n");
   const g = gerado.replace(/\r\n/g, "\n");
   return a === g ? { estado: "ok" } : { estado: "divergente", a, g };
-}
-
-/**
- * **Lança, em vez de `process.exit()`.** A primeira versão encerrava o processo
- * no meio do `fetch`, e no Windows o Node abortava com
- * `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` — **saindo 127 em vez
- * de 2**, com a mensagem certa impressa antes. Um código de saída que depende do
- * sistema operacional não é o código que a INV-067b promete. O erro sobe até o
- * fim do arquivo, que põe `process.exitCode` e deixa o loop terminar sozinho.
- */
-class NaoConferido extends Error {
-  constructor(codigo, mensagem) {
-    super(mensagem);
-    this.codigo = codigo;
-  }
-}
-
-function falhar(codigo, mensagem) {
-  throw new NaoConferido(codigo, mensagem);
 }
 
 function autoteste() {
@@ -110,50 +89,7 @@ function autoteste() {
     console.log(`${passou ? "ok" : "!!"} ${nome}`);
   }
   console.log(`autoteste: ${ok} de ${casos.length}`);
-  process.exit(ok === casos.length ? 0 : 1);
-}
-
-function lerLock() {
-  let lock;
-  try {
-    lock = JSON.parse(readFileSync(LOCK, "utf8"));
-  } catch (erro) {
-    falhar(2, `NAO CONFERIDO: ${LOCK} ausente ou invalido (${erro.message})`);
-  }
-  if (typeof lock.back !== "string" || !/^[0-9a-f]{40}$/.test(lock.back)) {
-    falhar(2, `NAO CONFERIDO: ${LOCK} precisa de "back" com o SHA completo (40 hex)`);
-  }
-  return lock.back;
-}
-
-async function baixarContrato(sha) {
-  let resposta;
-  try {
-    resposta = await fetch(ORIGEM(sha), { signal: AbortSignal.timeout(30_000) });
-  } catch (erro) {
-    falhar(2, `NAO CONFERIDO: a rede falhou buscando ${ORIGEM(sha)} (${erro.message})`);
-  }
-  if (!resposta.ok) {
-    falhar(2, `NAO CONFERIDO: ${ORIGEM(sha)} respondeu ${resposta.status}`);
-  }
-  const texto = await resposta.text();
-  try {
-    if (!JSON.parse(texto).openapi) throw new Error("sem o campo `openapi`");
-  } catch (erro) {
-    falhar(2, `NAO CONFERIDO: o que veio de ${ORIGEM(sha)} nao e um OpenAPI (${erro.message})`);
-  }
-  return texto;
-}
-
-/** O CLI do gerador, pelo pacote instalado — o mesmo `^7.13` do `package.json`. */
-function caminhoDoGerador() {
-  const exigir = createRequire(join(process.cwd(), "package.json"));
-  try {
-    const pacote = exigir.resolve("openapi-typescript/package.json");
-    return join(pacote, "..", "bin", "cli.js");
-  } catch {
-    falhar(2, "NAO CONFERIDO: openapi-typescript nao esta instalado (rode o install antes)");
-  }
+  process.exitCode = ok === casos.length ? 0 : 1;
 }
 
 function linhasQueDivergem(dir, a, g) {
@@ -220,18 +156,5 @@ async function conferir() {
   }
 }
 
-if (process.argv.includes("--autoteste")) {
-  autoteste();
-} else {
-  try {
-    await conferir();
-  } catch (erro) {
-    // Erro que ninguem previu tambem e `2`: o gate nunca passa em silencio.
-    console.error(
-      erro instanceof NaoConferido
-        ? erro.message
-        : `NAO CONFERIDO: erro inesperado (${erro.message})`,
-    );
-    process.exitCode = erro instanceof NaoConferido ? erro.codigo : 2;
-  }
-}
+if (process.argv.includes("--autoteste")) autoteste();
+else await executar(conferir);

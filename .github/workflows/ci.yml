@@ -6,6 +6,11 @@ on:
   pull_request:
   push:
     branches: [main]
+  # SPEC-067/TASK-002 — a PR-espelho `contrato/sync` e aberta pelo
+  # `GITHUB_TOKEN`, e o GitHub NAO dispara workflows por eventos desse token
+  # (exceto `workflow_dispatch`). Sem esta linha a PR ficaria para sempre
+  # "aguardando status"; o `sincronizar-contrato.mjs` dispara o CI por aqui.
+  workflow_dispatch:
 
 jobs:
   build:
