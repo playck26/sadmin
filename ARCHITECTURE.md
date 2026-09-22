@@ -121,9 +121,21 @@ coisas acima.
 `lib/api-types.ts` é **gerado** do `openapi.json` do `back`
 (`pnpm run gen:api-types`). Não editar à mão.
 
-**Gap conhecido:** o CI **não** valida se esse arquivo está atualizado — a
-mitigação é lembrar de rodar o comando, que é o tipo de mitigação que falha
-em silêncio. Ver Gaps.
+**O gap fechou na SPEC-067 (2026-09-22).** O job **`contrato`** do CI compara
+este arquivo com o contrato do `back` **fixado por SHA** em
+`src/lib/contrato.lock.json`, buscado por `raw` imutável — em poly-repo não há
+`../Back` no checkout (ADR-001). Ele gera num temporário e **não escreve** no
+repositório, e o passo exige a linha `OK ... em dia`, não só o exit 0: um
+script vazio também sai 0, e isso aconteceu ao replicar o gate.
+
+Duas perguntas, dois mecanismos. O job responde *"os tipos correspondem ao
+contrato fixado?"* e **reprova a PR**. O `contrato.yml` agendado responde *"o
+contrato fixado ainda é o atual?"* e **abre uma PR-espelho** (`contrato/sync`)
+em vez de reprovar PR alheia — 82 dos 277 commits do `back` em 30 dias mexeram
+no contrato.
+
+**Ressalva:** até o ruleset exigir `contrato` (SPEC-067/TASK-004, passo de
+painel), o job aparece na PR mas **não bloqueia** o merge.
 
 ## 7. Requisitos de plataforma
 
@@ -136,7 +148,7 @@ produção custa **15 créditos**, qualquer que seja o tamanho do commit; entre 
 15/09, 26 merges nos três frontends gastaram ~351 dos 500. O `netlify.toml` chama
 `scripts/netlify-ignore.mjs`, que **cancela o build (exit 0) só se todo arquivo
 mudado** for documentação fora de `public/`, teste, `src/lib/api-types.ts` (só
-tipos), CI, lint ou a própria regra. Sem os dois commits, com o mesmo commit
+tipos), o `src/lib/contrato.lock.json` (SPEC-067), CI, lint ou a própria regra. Sem os dois commits, com o mesmo commit
 (*Trigger deploy* manual) ou com o `git diff` falhando, **constrói**. Aplicado ao
 histórico real da semana, pula exatamente os 6 deploys que não mudavam o site e
 constrói os outros 20. **O arquivo é idêntico nos três frontends**, sem gate de
@@ -149,7 +161,7 @@ deploy*.
 |---|---|
 | `page.tsx` fina; lógica em componente cliente | revisão |
 | Todo acesso autenticado por `authFetch` | busca por `fetch(` fora de `lib/` — **0 violações em 2026-08-22** |
-| `api-types.ts` nunca editado à mão | arquivo é gerado; diff denuncia |
+| `api-types.ts` nunca editado à mão, e em dia com o contrato fixado | job **`contrato`** do CI (SPEC-067): regenera do `back@<sha>` do `contrato.lock.json` e compara — reprova a PR. Obrigatório só depois da TASK-004 |
 | Sem estado global sem ADR | busca por libs de estado no CI seria o gate — **hoje não existe** |
 | `typecheck`, `lint`, `test`, `build` verdes | CI (GitHub Actions) a cada push |
 
@@ -200,7 +212,7 @@ tem como contar de onde a lista vem.
 
 | # | Gap | Severidade |
 |---|---|---|
-| 1 | **`api-types.ts` pode ficar stale**: o CI não compara com o `openapi.json` do `back`. Já aconteceu — o `sadmin` acumulou 1.461 linhas de diferença | Média |
+| 1 | ~~`api-types.ts` pode ficar stale~~ — **fechado na SPEC-067**: o job `contrato` compara com o contrato fixado por SHA, e o `contrato.yml` abre PR quando o `back` anda. **Resta:** o job só bloqueia o merge depois que o ruleset o exigir (TASK-004) | Baixa |
 | 2 | **Sem estado global e sem cache de servidor**: cada tela refaz suas chamadas. Adequado hoje; vira problema quando duas telas precisarem do mesmo dado fresco | Média |
 | 3 | Sem tratamento de offline apesar do service worker registrado (`cliente`) | Baixa |
 | 4 | Cobertura de teste concentrada em poucos componentes | Média |
