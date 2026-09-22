@@ -1,0 +1,59 @@
+name: Contrato do Back
+
+# SPEC-067/TASK-002 — o contrato fixado em `src/lib/contrato.lock.json` ainda e
+# o do `main` do Back? Se nao for, abre (ou atualiza) UMA PR que o atualiza.
+#
+# E a pergunta de ATUALIDADE, e por isso nao mora no `ci.yml`: ela nao pode
+# bloquear PR alheia. O job `contrato` do CI responde a outra -- os tipos
+# correspondem ao contrato FIXADO? -- e essa bloqueia.
+#
+# A logica mora em `.github/scripts/sincronizar-contrato.mjs`; este arquivo so
+# agenda, da permissao e exige a linha de sucesso.
+on:
+  schedule:
+    # 09:00 UTC = 06:00 em Sao Paulo, dias uteis. Antes do expediente, para a
+    # PR estar la quando alguem abrir o GitHub.
+    - cron: "0 9 * * 1-5"
+  workflow_dispatch:
+
+# Duas execucoes ao mesmo tempo correriam entre `gh pr list` e `gh pr create`
+# (ressalva da 3a rodada de validacao). Com `cancel-in-progress: false` a
+# segunda ESPERA a primeira terminar, em vez de falhar ou de ser descartada.
+concurrency:
+  group: contrato-sync
+  cancel-in-progress: false
+
+# `default_workflow_permissions` e `read` nos tres repositorios (medido em
+# 2026-09-22); estas sao as que este job precisa, e so ele.
+permissions:
+  contents: write # empurrar a branch `contrato/sync`
+  pull-requests: write # abrir a PR-espelho
+  actions: write # disparar o `ci.yml` na branch -- PR aberta pelo token nao o dispara
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # So para ter o `openapi-typescript` na versao do lockfile.
+      - run: pnpm install --frozen-lockfile
+
+      # Exige a LINHA de sucesso, e nao so o exit 0: um script vazio tambem
+      # sai 0 -- aconteceu ao replicar o gate da TASK-001.
+      - name: comparar o lock com o main do Back
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          saida="$(node .github/scripts/sincronizar-contrato.mjs)"
+          echo "$saida"
+          echo "$saida" | grep -Eq '^(EM DIA|JA SINCRONIZADO|SINCRONIZADO): '
