@@ -1284,6 +1284,22 @@ export interface paths {
         patch: operations["ClassesController_update"];
         trace?: never;
     };
+    "/api/v1/classes/{id}/eventos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ClassesController_eventos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/classes/{id}/ocorrencias-canceladas": {
         parameters: {
             query?: never;
@@ -1790,6 +1806,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["MeAvisosController_marcarLidas"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/fila-de-espera": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MeFilaDeEsperaController_minhasLinhas"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2955,7 +2987,7 @@ export interface components {
              * @description O GESTO humano que provocou o evento.
              * @enum {string}
              */
-            acao: "reserva_criada" | "reserva_cancelada" | "reserva_movida" | "aula_cancelada" | "pagamento_confirmado" | "turma_criada" | "turma_horario_editado" | "credito_lancado" | "credito_retirado" | "turma_aluno_removido" | "turma_inativada" | "turma_reativada" | "aula_reativada";
+            acao: "reserva_criada" | "reserva_cancelada" | "reserva_movida" | "aula_cancelada" | "pagamento_confirmado" | "turma_criada" | "turma_horario_editado" | "credito_lancado" | "credito_retirado" | "turma_aluno_removido" | "turma_inativada" | "turma_reativada" | "aula_reativada" | "turma_professor_alterado";
             /** @description Nota interna, e só existe em ação administrativa que a exige. Consumo e devolução não têm motivo — o motivo deles é a própria reserva. */
             motivo: Record<string, never> | null;
             autor: components["schemas"]["AutorDoEventoDto"];
@@ -3475,6 +3507,23 @@ export interface components {
             /** @example 4 */
             alunosAlocados: number;
             alunos: components["schemas"]["AlunoDaTurmaResponseDto"][];
+        };
+        EventoDeTurmaResponseDto: {
+            /**
+             * @description O efeito sobre a TURMA.
+             * @enum {string}
+             */
+            tipo: "professor_alterado";
+            /** Format: date-time */
+            em: string;
+            /**
+             * @description O GESTO humano que provocou o evento.
+             * @enum {string}
+             */
+            acao: "reserva_criada" | "reserva_cancelada" | "reserva_movida" | "aula_cancelada" | "pagamento_confirmado" | "turma_criada" | "turma_horario_editado" | "credito_lancado" | "credito_retirado" | "turma_aluno_removido" | "turma_inativada" | "turma_reativada" | "aula_reativada" | "turma_professor_alterado";
+            /** @description Nota interna da ação administrativa. A troca de professor não pede motivo, então hoje ela chega sempre nula nesta resposta. */
+            motivo: Record<string, never> | null;
+            autor: components["schemas"]["AutorDoEventoDto"];
         };
         AulaCanceladaResponseDto: {
             /**
@@ -4117,6 +4166,43 @@ export interface components {
         MarcadasResponseDto: {
             /** @example 3 */
             marcadas: number;
+        };
+        MinhaLinhaDaFilaResponseDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000003 */
+            id: string;
+            /**
+             * @description `turma` = vaga de matrícula; `aula` = vaga de reposição.
+             * @example turma
+             */
+            fila: string;
+            /**
+             * @description Só `aguardando` ou `chamado`: a lista é das filas VIVAS.
+             * @example aguardando
+             */
+            estado: string;
+            /** @description **É a sua vez, e ainda dá tempo.** `estado = chamado` **e** o prazo ainda não venceu. A SPEC-064/D8 é explícita: a tela confere `chamado_ate` por conta própria e **não depende do varredor** — com o varredor desligado, uma vez vencida não pode aparecer como aberta. */
+            vezAberta: boolean;
+            /**
+             * @description Até quando a vez vale. `null` enquanto não foi chamado.
+             * @example 2026-09-21T12:00:00.000Z
+             */
+            chamadoAte: string | null;
+            turmaId: string | null;
+            /** @description O nome da turma do alvo — na fila de aula, a turma da aula. */
+            turmaNome: string | null;
+            ocupacaoId: string | null;
+            /**
+             * @description A data da aula, na fila de aula.
+             * @example 2026-09-25
+             */
+            data: string | null;
+            /** @example 19:00 */
+            horaInicio: string | null;
+            /** @example 20:00 */
+            horaFim: string | null;
+            quadraNome: string | null;
+            /** @example 2026-09-20T12:31:00.000Z */
+            criadaEm: string;
         };
         EntrarNaFilaDeTurmaDto: {
             /** @example 5f7c1e2a-0000-4000-8000-000000000001 */
@@ -6869,6 +6955,34 @@ export interface operations {
             };
         };
     };
+    ClassesController_eventos: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventoDeTurmaResponseDto"][];
+                };
+            };
+            /** @description Turma inexistente, ou de outra empresa. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ClassesController_ocorrenciasCanceladas: {
         parameters: {
             query?: never;
@@ -7865,6 +7979,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MarcadasResponseDto"];
+                };
+            };
+        };
+    };
+    MeFilaDeEsperaController_minhasLinhas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MinhaLinhaDaFilaResponseDto"][];
                 };
             };
         };
