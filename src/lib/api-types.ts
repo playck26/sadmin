@@ -3926,6 +3926,8 @@ export interface components {
         FaltaParaReporResponseDto: {
             /** Format: uuid */
             faltaId: string;
+            /** Format: uuid */
+            ocupacaoId: string;
             turmaNome: string | null;
             /** Format: date */
             data: string;
