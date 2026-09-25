@@ -2664,10 +2664,14 @@ export interface components {
             prazoCancelamentoReservaHoras: number | null;
             /** @example 150 */
             precoAulaPadrao: number | null;
+            /** @example null */
+            antecedenciaFilaAulaHoras: number | null;
             /** @example Quadra */
             nomeTipoQuadra: string;
             /** @example Aula particular */
             nomeTipoAula: string;
+            /** @example 2 */
+            antecedenciaFilaAulaPadraoHoras: number;
         };
         MinhaEmpresaResponseDto: {
             /** Format: uuid */
@@ -3023,6 +3027,11 @@ export interface components {
              * @example 150
              */
             precoAulaPadrao?: number | null;
+            /**
+             * @description Com quantas horas antes da aula a fila de espera de AULA ainda chama alguem. `null` = usa o padrao do servidor (`antecedenciaFilaAulaPadraoHoras`). Nao vale para a fila de turma.
+             * @example 2
+             */
+            antecedenciaFilaAulaHoras?: number | null;
         };
         ConfigOperacaoResponseDto: {
             /** @example 2 */
@@ -3031,6 +3040,8 @@ export interface components {
             prazoCancelamentoReservaHoras: number | null;
             /** @example 150 */
             precoAulaPadrao: number | null;
+            /** @example null */
+            antecedenciaFilaAulaHoras: number | null;
         };
         DiaDaAgendaResponseDto: {
             /** @example 2026-09-01 */
@@ -7636,7 +7647,10 @@ export interface operations {
     };
     MeReposicoesController_oportunidades: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Inclui as ocorrencias SEM VAGA (`vagas: 0`), para o aluno poder entrar na fila de espera delas (card 5331). Sem o parametro, so as que tem vaga — o comportamento de antes desta task. */
+                incluirSemVaga?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
