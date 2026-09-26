@@ -1246,7 +1246,7 @@ export interface paths {
         get?: never;
         put: operations["ClassesController_naoHouve"];
         post?: never;
-        delete?: never;
+        delete: operations["ClassesController_desfazerNaoHouve"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1532,7 +1532,7 @@ export interface paths {
             cookie?: never;
         };
         get: operations["MeTeacherAttendanceController_chamada"];
-        put: operations["MeTeacherAttendanceController_salvar"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1550,7 +1550,7 @@ export interface paths {
         get?: never;
         put: operations["MeTeacherAttendanceController_naoHouve"];
         post?: never;
-        delete?: never;
+        delete: operations["MeTeacherAttendanceController_desfazerNaoHouve"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1892,6 +1892,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/pre-reservas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["MePreReservasController_meus"];
+        put?: never;
+        post: operations["MePreReservasController_pedir"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/pre-reservas/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["MePreReservasController_cancelar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2022,7 +2054,10 @@ export interface components {
             ratificadas: number;
             /** @example 3 */
             humanas: number;
-            /** @example 1 */
+            /**
+             * @description Aulas anteriores à automação sem registro de presença — não cobram ação.
+             * @example 1
+             */
             pendentesLegadas: number;
             /** @example 0 */
             pendentesAtuais: number;
@@ -2664,10 +2699,14 @@ export interface components {
             prazoCancelamentoReservaHoras: number | null;
             /** @example 150 */
             precoAulaPadrao: number | null;
+            /** @example null */
+            antecedenciaFilaAulaHoras: number | null;
             /** @example Quadra */
             nomeTipoQuadra: string;
             /** @example Aula particular */
             nomeTipoAula: string;
+            /** @example 2 */
+            antecedenciaFilaAulaPadraoHoras: number;
         };
         MinhaEmpresaResponseDto: {
             /** Format: uuid */
@@ -3023,6 +3062,11 @@ export interface components {
              * @example 150
              */
             precoAulaPadrao?: number | null;
+            /**
+             * @description Com quantas horas antes da aula a fila de espera de AULA ainda chama alguem. `null` = usa o padrao do servidor (`antecedenciaFilaAulaPadraoHoras`). Nao vale para a fila de turma.
+             * @example 2
+             */
+            antecedenciaFilaAulaHoras?: number | null;
         };
         ConfigOperacaoResponseDto: {
             /** @example 2 */
@@ -3031,6 +3075,8 @@ export interface components {
             prazoCancelamentoReservaHoras: number | null;
             /** @example 150 */
             precoAulaPadrao: number | null;
+            /** @example null */
+            antecedenciaFilaAulaHoras: number | null;
         };
         DiaDaAgendaResponseDto: {
             /** @example 2026-09-01 */
@@ -3411,13 +3457,18 @@ export interface components {
             cancelada: boolean;
             chamadaFeita: boolean;
             /** @enum {string} */
-            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "cancelada";
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "sem_registro" | "cancelada";
             /** @example Carlos Lima */
             registradoPor: string | null;
             /** @enum {string|null} */
             origem: "automatica" | "professor" | "gestor" | "legada_humana" | null;
             /** @enum {string|null} */
             origemInicial: "automatica" | "professor" | "gestor" | "legada_humana" | null;
+            /**
+             * Format: date-time
+             * @example 2026-10-03T03:00:00.000Z
+             */
+            desfazerNaoHouveAte: string | null;
             alunos: components["schemas"]["AlunoNoHistoricoResponseDto"][];
         };
         ChamadaNaoHouveResponseDto: {
@@ -3425,6 +3476,15 @@ export interface components {
             ocupacaoId: string;
             /** @example nao_houve */
             completude: string;
+        };
+        NaoHouveDesfeitoResponseDto: {
+            /** Format: uuid */
+            ocupacaoId: string;
+            /**
+             * @description `feita` (refechada, com o instante de antes), `sem_participantes`, `pendente` (pós-corte, o worker fecha) ou `sem_registro` (anterior ao corte) — ou o estado de antes, quando não havia `nao_houve`.
+             * @enum {string}
+             */
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "sem_registro" | "cancelada";
         };
         TurmaEncontroResponseDto: {
             /** @example 2 */
@@ -3434,7 +3494,7 @@ export interface components {
             /** @example 19:00 */
             horaFim: string;
         };
-        TurmaResponseDto: {
+        TurmaComLotacaoResponseDto: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
@@ -3454,9 +3514,15 @@ export interface components {
             status: "ativa" | "inativa";
             /** @example 4 */
             alunosAlocados: number;
+            /**
+             * Format: date
+             * @description A primeira aula que ainda não terminou em que um aluno novo NÃO caberia, contando as reposições marcadas (ADR-027). Só vem preenchida quando a turma tem vaga de matrícula (`alunosAlocados < capacidade`) — sem vaga, a turma já está cheia e isto não acrescenta nada. `null` quando cabe. Quem já é visitante daquela aula ainda pode ser alocado: a alocação decide com o aluno de verdade.
+             * @example 2026-10-03
+             */
+            proximaAulaLotada: string | null;
         };
         TurmaPaginadaResponseDto: {
-            data: components["schemas"]["TurmaResponseDto"][];
+            data: components["schemas"]["TurmaComLotacaoResponseDto"][];
             /** @example 1 */
             page: number;
             /** @example 20 */
@@ -3479,6 +3545,27 @@ export interface components {
             quadraId: string;
             encontros: components["schemas"]["EncontroDto"][];
             capacidade: number;
+        };
+        TurmaResponseDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            companyId: string;
+            /** @example Turma Iniciante */
+            nome: string;
+            /** Format: uuid */
+            nivelId: string | null;
+            /** Format: uuid */
+            professorId: string | null;
+            /** Format: uuid */
+            quadraId: string;
+            encontros: components["schemas"]["TurmaEncontroResponseDto"][];
+            /** @example 10 */
+            capacidade: number;
+            /** @enum {string} */
+            status: "ativa" | "inativa";
+            /** @example 4 */
+            alunosAlocados: number;
         };
         AlunoDaTurmaResponseDto: {
             /** Format: uuid */
@@ -3506,6 +3593,12 @@ export interface components {
             status: "ativa" | "inativa";
             /** @example 4 */
             alunosAlocados: number;
+            /**
+             * Format: date
+             * @description A primeira aula que ainda não terminou em que um aluno novo NÃO caberia, contando as reposições marcadas (ADR-027). Só vem preenchida quando a turma tem vaga de matrícula (`alunosAlocados < capacidade`) — sem vaga, a turma já está cheia e isto não acrescenta nada. `null` quando cabe. Quem já é visitante daquela aula ainda pode ser alocado: a alocação decide com o aluno de verdade.
+             * @example 2026-10-03
+             */
+            proximaAulaLotada: string | null;
             alunos: components["schemas"]["AlunoDaTurmaResponseDto"][];
         };
         EventoDeTurmaResponseDto: {
@@ -3621,7 +3714,7 @@ export interface components {
              */
             podeEntrar: boolean;
             /**
-             * @description Por que não pode entrar. `null` quando pode.
+             * @description Por que não pode entrar. `null` quando pode. `TURMA_CHEIA` também quando há vaga de matrícula mas uma das próximas aulas já está lotada contando as reposições marcadas — a matrícula deixaria esse dia acima da capacidade.
              * @enum {string|null}
              */
             motivo?: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | null;
@@ -3652,7 +3745,7 @@ export interface components {
             /** @example 409 */
             statusCode: number;
             /**
-             * @description O código é o contrato; a mensagem é texto para humano e pode mudar sem aviso. Tela que decide pela mensagem quebra na primeira revisão de copy.
+             * @description O código é o contrato; a mensagem é texto para humano e pode mudar sem aviso. Tela que decide pela mensagem quebra na primeira revisão de copy. `TURMA_CHEIA` vem também quando uma das próximas aulas já está lotada contando as reposições marcadas, e então a mensagem diz o dia.
              * @enum {string}
              */
             code: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | "PRAZO_DE_CANCELAMENTO";
@@ -3778,12 +3871,13 @@ export interface components {
             marcados: number;
             /** @example 8 */
             totalAlunos: number;
+            /** @description Dentro do prazo de registrar que a aula não aconteceu. Ninguém lança presença à mão (SPEC-076). */
             podeLancar: boolean;
             /**
-             * @description `futura` = ainda não começou. `em_andamento` = começou e não terminou. `pendente` = terminou sem chamada. `feita` = chamada declarada completa. `legada` = chamada anterior à SPEC-015. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030). `sem_participantes` = terminou depois do corte da presença automática, sem chamada e sem participante (SPEC-057); não é pendência. `cancelada` = ocorrência cancelada.
+             * @description `futura` = ainda não começou. `em_andamento` = começou e não terminou. `pendente` = terminou depois do corte e o fechamento automático ainda não passou. `sem_registro` = terminou sem chamada antes do corte, anterior à automação (SPEC-076/D5). `feita` = chamada declarada completa. `legada` = chamada anterior à SPEC-015. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030). `sem_participantes` = terminou depois do corte da presença automática, sem chamada e sem participante (SPEC-057); não é pendência. `cancelada` = ocorrência cancelada.
              * @enum {string}
              */
-            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "cancelada";
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "sem_registro" | "cancelada";
         };
         OcorrenciasDaTurmaPaginadasResponseDto: {
             data: components["schemas"]["OcorrenciaDaTurmaResponseDto"][];
@@ -3825,31 +3919,23 @@ export interface components {
             origemInicial: "automatica" | "professor" | "gestor" | "legada_humana" | null;
             /**
              * Format: date-time
+             * @description Prazo da exceção do `nao_houve` sobre chamada automática: o fechamento automático + 7 dias. Ninguém corrige presença (SPEC-076).
              * @example 2026-09-25T17:00:00.000Z
              */
             corrigivelAte: string | null;
+            /**
+             * Format: date-time
+             * @example 2026-10-03T03:00:00.000Z
+             */
+            desfazerNaoHouveAte: string | null;
+            /**
+             * @description O estado da ocorrência, pelo mesmo resolvedor da lista da turma e do histórico do gestor.
+             * @enum {string}
+             */
+            estado: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "sem_registro" | "cancelada";
+            /** @description Sem uso de escrita desde a SPEC-076 (o `PUT` da chamada saiu). */
             versao: string;
             alunos: components["schemas"]["LinhaDaChamadaResponseDto"][];
-        };
-        ItemChamadaDto: {
-            alunoId: string;
-            /** @enum {string} */
-            status: "presente" | "ausente" | "justificado";
-        };
-        SalvarChamadaDto: {
-            /**
-             * @description Opaca: devolva exatamente o que o GET entregou, sem interpretar. O formato já mudou duas vezes (ganhou o cabecalho e a impressao digital da matricula) e pode mudar de novo — quem fizer parse quebra sem aviso. Serve so para comparacao de igualdade.
-             * @example <opaco — devolva o valor recebido no GET>
-             */
-            versao: string;
-            itens: components["schemas"]["ItemChamadaDto"][];
-        };
-        ChamadaSalvaResponseDto: {
-            /** Format: uuid */
-            ocupacaoId: string;
-            versao: string;
-            /** @example 8 */
-            total: number;
         };
         DiaDaAgendaDoProfessorDto: {
             /** @example 2026-09-01 */
@@ -3870,7 +3956,7 @@ export interface components {
              */
             particulares: number;
             /**
-             * @description Quantas ainda sem chamada registrada. É esta contagem que faz o calendário valer: a grade ele já conhece de cabeça; o que falta registrar, não. **Aula particular nunca entra aqui** (SPEC-039/LIM-039a), mas conta em `aulas`.
+             * @description Quantas aulas `pendente`: terminaram depois do corte e o fechamento automático ainda não passou. **Não é cobrança do professor** desde a SPEC-076 (ninguém lança presença à mão); fica no contrato por compatibilidade (LIM-076d). `sem_registro` não entra. **Aula particular nunca entra aqui** (SPEC-039/LIM-039a), mas conta em `aulas`.
              * @example 1
              */
             pendentes: number;
@@ -3893,10 +3979,10 @@ export interface components {
             /** @example 19:00 */
             horaFim: string;
             /**
-             * @description `futura` = ainda não começou; a chamada **não** pode ser lançada. `em_andamento` = começou e não terminou; pode lançar, e não é pendência. `pendente` = já terminou e não há linha em `chamadas`. `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030); **não** é pendência e não pinta o ponto vermelho. `sem_participantes` = terminou depois do corte da presença automática, sem chamada e sem ninguém matriculado nem repondo (SPEC-057); não é pendência. `cancelada` não aparece aqui: o filtro do calendário a exclui antes. **`null` na aula PARTICULAR** (SPEC-039/LIM-039a): ela não tem chamada, e resolver um estado ali pintaria `pendente` numa aula que nunca poderá receber uma — ponto vermelho que o professor não limpa.
+             * @description `futura` = ainda não começou. `em_andamento` = começou e não terminou. `pendente` = terminou depois do corte da presença automática e o fechamento automático ainda não passou (SPEC-076: aguardando, não é cobrança). `sem_registro` = terminou sem chamada ANTES do corte (ou sem corte): anterior à automação, não é pendência (SPEC-076/D5). `legada` = chamada de antes da SPEC-015, com `completude: desconhecida`. `nao_houve` = alguém declarou que a aula não aconteceu (SPEC-030). `sem_participantes` = terminou depois do corte da presença automática, sem chamada e sem ninguém matriculado nem repondo (SPEC-057); não é pendência. `cancelada` não aparece aqui: o filtro do calendário a exclui antes. **`null` na aula PARTICULAR** (SPEC-039/LIM-039a): ela não tem chamada, e resolver um estado ali diria `pendente` numa aula que nunca poderá receber uma.
              * @enum {string|null}
              */
-            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | null;
+            chamada: "futura" | "em_andamento" | "pendente" | "feita" | "legada" | "nao_houve" | "sem_participantes" | "sem_registro" | null;
             /**
              * @description Quantos avisaram falta nesta aula.
              * @example 2
@@ -4251,6 +4337,39 @@ export interface components {
              * @example 5f7c1e2a-0000-4000-8000-000000000004
              */
             reposicaoId: string | null;
+        };
+        PreReservaResponseDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000003 */
+            id: string;
+            /** @example 5f7c1e2a-0000-4000-8000-000000000001 */
+            quadraId: string;
+            /** @example 2026-10-02 */
+            data: string;
+            /** @example 19:00 */
+            horaInicio: string;
+            /** @example 20:00 */
+            horaFim: string;
+            /**
+             * @description Nasce `aguardando`. Quem o muda para `avisada` é o varredor (SPEC-074/D3), nunca esta rota.
+             * @example aguardando
+             */
+            estado: string;
+            /** @example 2026-09-25T12:31:00.000Z */
+            criadaEm: string;
+        };
+        PedirPreReservaDto: {
+            /** @example 5f7c1e2a-0000-4000-8000-000000000001 */
+            quadraId: string;
+            /**
+             * @description AAAA-MM-DD
+             * @example 2026-10-02
+             */
+            data: string;
+            /**
+             * @description O início do slot, em hora cheia. O fim é o servidor que diz.
+             * @example 19:00
+             */
+            horaInicio: string;
         };
     };
     responses: never;
@@ -6866,6 +6985,28 @@ export interface operations {
             };
         };
     };
+    ClassesController_desfazerNaoHouve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                turmaId: string;
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NaoHouveDesfeitoResponseDto"];
+                };
+            };
+        };
+    };
     ClassesController_list: {
         parameters: {
             query?: {
@@ -7074,6 +7215,20 @@ export interface operations {
                     "application/json": components["schemas"]["MatriculaEmTurmaResponseDto"];
                 };
             };
+            /** @description Turma sem vaga de matrícula (capacidade), ou uma das próximas aulas já lotada contando as reposições marcadas (`AULA_LOTADA`): alocar deixaria esse dia acima da capacidade, e a mensagem diz o dia. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Aluno desligado (`ALUNO_INATIVO`), ou de outro nível (`NIVEL_INCOMPATIVEL`, SPEC-075/D5): o gestor também é recusado, e a mensagem diz o que fazer — mudar o nível do aluno. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
     };
     ClassesController_removeStudent: {
@@ -7223,6 +7378,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ErroDeMatriculaResponseDto"];
                 };
+            };
+            /** @description Turma de outro nível (`NIVEL_INCOMPATIVEL`, SPEC-075). A mensagem diz o nível da turma e o do aluno — ou que ele ainda não tem nível e conta como o primeiro. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -7488,31 +7650,6 @@ export interface operations {
             };
         };
     };
-    MeTeacherAttendanceController_salvar: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                ocupacaoId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SalvarChamadaDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChamadaSalvaResponseDto"];
-                };
-            };
-        };
-    };
     MeTeacherAttendanceController_naoHouve: {
         parameters: {
             query?: never;
@@ -7530,6 +7667,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChamadaNaoHouveResponseDto"];
+                };
+            };
+        };
+    };
+    MeTeacherAttendanceController_desfazerNaoHouve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ocupacaoId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NaoHouveDesfeitoResponseDto"];
                 };
             };
         };
@@ -7625,7 +7783,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Já matriculado na turma de destino (`JA_MATRICULADO_NA_TURMA`) ou turma fora de operação (`TURMA_INATIVA`). */
+            /** @description Já matriculado na turma de destino (`JA_MATRICULADO_NA_TURMA`), turma fora de operação (`TURMA_INATIVA`) ou turma de outro nível (`NIVEL_INCOMPATIVEL`, SPEC-075). */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -7636,7 +7794,10 @@ export interface operations {
     };
     MeReposicoesController_oportunidades: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Inclui as ocorrencias SEM VAGA (`vagas: 0`), para o aluno poder entrar na fila de espera delas (card 5331). Sem o parametro, so as que tem vaga — o comportamento de antes desta task. */
+                incluirSemVaga?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -8032,7 +8193,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Turma fora de operação (`TURMA_INATIVA`) ou já matriculado nela (`JA_MATRICULADO_NA_TURMA`). */
+            /** @description Turma fora de operação (`TURMA_INATIVA`), já matriculado nela (`JA_MATRICULADO_NA_TURMA`) ou turma de outro nível (`NIVEL_INCOMPATIVEL`, SPEC-075). */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -8069,7 +8230,7 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Já matriculado na turma da aula (`JA_MATRICULADO_NA_TURMA`). */
+            /** @description Já matriculado na turma da aula (`JA_MATRICULADO_NA_TURMA`) ou turma de outro nível (`NIVEL_INCOMPATIVEL`, SPEC-075). */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -8097,7 +8258,7 @@ export interface operations {
                     "application/json": components["schemas"]["ConfirmacaoDaVezResponseDto"];
                 };
             };
-            /** @description A vez nao esta aberta (`NAO_E_SUA_VEZ`), o prazo venceu (`VEZ_EXPIRADA`) ou a confirmacao foi recusada pelo gesto de destino (`TURMA_SEM_VAGA`, `TURMA_CHEIA`, `SEM_CREDITO_DE_REPOSICAO`, `TETO_DE_REPOSICAO`, ...). **Em todos, a linha fica encerrada.** */
+            /** @description A vez nao esta aberta (`NAO_E_SUA_VEZ`), o prazo venceu (`VEZ_EXPIRADA`) ou a confirmacao foi recusada pelo gesto de destino (`TURMA_SEM_VAGA`, `TURMA_CHEIA`, `SEM_CREDITO_DE_REPOSICAO`, `NIVEL_INCOMPATIVEL` (SPEC-075), `TETO_DE_REPOSICAO`, ...). **Em todos, a linha fica encerrada.** */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -8118,6 +8279,95 @@ export interface operations {
         requestBody?: never;
         responses: {
             204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MePreReservasController_meus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreReservaResponseDto"][];
+                };
+            };
+        };
+    };
+    MePreReservasController_pedir: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PedirPreReservaDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreReservaResponseDto"];
+                };
+            };
+            /** @description A quadra não existe nesta empresa. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description O horário está livre (`HORARIO_LIVRE`), já é do aluno (`HORARIO_JA_E_SEU`), ou o aviso já foi pedido (`PRE_RESERVA_DUPLICADA`). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Aluno inativo (`ALUNO_INATIVO`), quadra fora de operação (`QUADRA_INATIVA`), horário que já começou (`HORARIO_NO_PASSADO`), fora do expediente (`FORA_DO_EXPEDIENTE`) ou teto de avisos ativos (`LIMITE_DE_PRE_RESERVAS`). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    MePreReservasController_cancelar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description O pedido não existe, é de outro aluno ou já terminou — os três no mesmo `404`, que não revela o pedido de ninguém. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
