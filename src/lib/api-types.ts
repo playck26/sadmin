@@ -3502,7 +3502,7 @@ export interface components {
             /** @example Turma Iniciante */
             nome: string;
             /** Format: uuid */
-            nivelId: string | null;
+            nivelId: string;
             /** Format: uuid */
             professorId: string | null;
             /** Format: uuid */
@@ -3540,7 +3540,8 @@ export interface components {
         };
         CreateClassDto: {
             nome: string;
-            nivelId?: string;
+            /** Format: uuid */
+            nivelId: string;
             professorId?: string;
             quadraId: string;
             encontros: components["schemas"]["EncontroDto"][];
@@ -3554,7 +3555,7 @@ export interface components {
             /** @example Turma Iniciante */
             nome: string;
             /** Format: uuid */
-            nivelId: string | null;
+            nivelId: string;
             /** Format: uuid */
             professorId: string | null;
             /** Format: uuid */
@@ -3581,7 +3582,7 @@ export interface components {
             /** @example Turma Iniciante */
             nome: string;
             /** Format: uuid */
-            nivelId: string | null;
+            nivelId: string;
             /** Format: uuid */
             professorId: string | null;
             /** Format: uuid */
@@ -3719,9 +3720,9 @@ export interface components {
              */
             motivo?: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | null;
             /** Format: uuid */
-            nivelId: string | null;
+            nivelId: string;
             /** @example Iniciante */
-            nivelNome: string | null;
+            nivelNome: string;
             encontros: components["schemas"]["EncontroDaTurmaDisponivelDto"][];
         };
         AulasProximasPaginadasResponseDto: {
@@ -3798,7 +3799,7 @@ export interface components {
             capacidade: number;
             encontros: components["schemas"]["TurmaEncontroResponseDto"][];
             quadraNome: string;
-            nivelNome: string | null;
+            nivelNome: string;
             professorNome: string | null;
             colegas: components["schemas"]["ColegaDeTurmaResponseDto"][];
         };
@@ -3832,7 +3833,7 @@ export interface components {
             nome: string;
             encontros: components["schemas"]["TurmaEncontroResponseDto"][];
             quadraNome: string;
-            nivelNome: string | null;
+            nivelNome: string;
             capacidade: number;
             totalAlunos: number;
             /** @enum {string} */
@@ -3850,7 +3851,7 @@ export interface components {
             nome: string;
             encontros: components["schemas"]["TurmaEncontroResponseDto"][];
             quadraNome: string;
-            nivelNome: string | null;
+            nivelNome: string;
             capacidade: number;
             alunos: components["schemas"]["AlunoDoProfessorResponseDto"][];
             /** @enum {string} */
@@ -4057,9 +4058,9 @@ export interface components {
             /** @example Iniciante Quinta */
             turmaNome: string;
             /** Format: uuid */
-            nivelId: string | null;
+            nivelId: string;
             /** @example Iniciante */
-            nivelNome: string | null;
+            nivelNome: string;
             /** @example Quadra 2 */
             quadraNome: string;
             /** Format: date */
