@@ -6,15 +6,22 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ApiError, login } from "@/lib/api-client";
+import { ApiError, login, MOTIVO_OUTRO_PERFIL } from "@/lib/api-client";
 import { saveAccessToken } from "@/lib/auth-storage";
 
-export function LoginForm() {
+// Chega aqui pelo `encerrarSessao` do api-client: a sessão do navegador virou
+// a de outra conta (ver o cabeçalho de `PERFIL_DO_PAINEL`).
+const MENSAGEM_SESSAO_DE_OUTRA_CONTA =
+  "A sessão deste navegador passou para outra conta — um login no painel do clube ou no app, por exemplo. Entre de novo com a conta de super admin.";
+
+export function LoginForm({ motivo }: { motivo?: string } = {}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    motivo === MOTIVO_OUTRO_PERFIL ? MENSAGEM_SESSAO_DE_OUTRA_CONTA : null,
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

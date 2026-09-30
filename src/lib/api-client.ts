@@ -2,8 +2,10 @@ import type { components } from "./api-types";
 import {
   clearAccessToken,
   getAccessToken,
+  perfilDoToken,
   saveAccessToken,
 } from "./auth-storage";
+import { navegarPara } from "./navegacao";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -94,15 +96,43 @@ async function renovarSessao(): Promise<boolean> {
   return renovacaoEmCurso;
 }
 
-function encerrarSessao(): void {
+/**
+ * **O cookie de refresh é um só para os três painéis.** O back grava
+ * `refresh_token` em `api.playck.com.br`, path `/api/v1/auth`, e o navegador
+ * o manda de volta a partir de qualquer painel. Quem entra no painel do clube
+ * ou no app **no mesmo navegador** troca o cookie do super admin pelo do
+ * gestor ou do aluno — e, na próxima renovação daqui, o back devolve com toda
+ * razão um access token de gestor. Até 2026-09-30 este painel o guardava e
+ * seguia: toda rota de `/companies` respondia `403` e a tela mostrava
+ * "Forbidden" com zero empresas, sem pista do motivo.
+ *
+ * O login também aceitava qualquer conta: um gestor que entrasse aqui caía
+ * na mesma tela.
+ *
+ * Agora um token de outro perfil — vindo do login, da renovação ou já salvo
+ * de antes — encerra a sessão deste painel e leva ao login com o motivo.
+ */
+const PERFIL_DO_PAINEL = "super_admin";
+
+export const MOTIVO_OUTRO_PERFIL = "outro-perfil";
+
+const MENSAGEM_CONTA_DE_OUTRO_PERFIL =
+  "Esta conta não é de super admin. Entre com a conta de super admin da plataforma.";
+
+function tokenDeOutroPerfil(token: string): boolean {
+  const perfil = perfilDoToken(token);
+  // Token ilegível não é prova de nada: quem decide é o servidor.
+  return perfil !== null && perfil !== PERFIL_DO_PAINEL;
+}
+
+function encerrarSessao(motivo?: string): void {
   clearAccessToken();
   if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
     // Navegação dura de propósito, em vez de `router.push`: este módulo não
     // é componente (não há hook disponível) e, mais importante, sessão
     // perdida deve descartar todo o estado em memória — cache de listas,
     // formulário pela metade, dados de outro usuário.
-    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-    window.location.href = "/login";
+    navegarPara(motivo ? `/login?motivo=${motivo}` : "/login");
   }
 }
 
@@ -125,6 +155,12 @@ async function requisicaoAutenticada(
   init: RequestInit,
 ): Promise<Response> {
   const accessToken = getAccessToken();
+  // Um ponto só para os dois caminhos: o token já salvo e o que acabou de
+  // chegar da renovação (que o salva antes da nova tentativa passar aqui).
+  if (accessToken && tokenDeOutroPerfil(accessToken)) {
+    encerrarSessao(MOTIVO_OUTRO_PERFIL);
+    throw new ApiError(403, MENSAGEM_CONTA_DE_OUTRO_PERFIL);
+  }
   return fetch(`${API_URL}/api/v1${path}`, {
     ...init,
     credentials: "include",
@@ -199,7 +235,14 @@ export async function login(dto: LoginDto): Promise<LoginResult> {
     throw new ApiError(res.status, await parseErrorMessage(res, "Não foi possível entrar"));
   }
 
-  return (await res.json()) as LoginResult;
+  const resultado = (await res.json()) as LoginResult;
+  // A credencial é válida, mas não serve a este painel: não guarda o token.
+  // A sessão que o back abriu fica com o cookie, e é a do próprio gestor —
+  // revogá-la derrubaria também o painel do clube dele neste navegador.
+  if (resultado.usuario.role !== PERFIL_DO_PAINEL) {
+    throw new ApiError(403, MENSAGEM_CONTA_DE_OUTRO_PERFIL);
+  }
+  return resultado;
 }
 
 export async function listCompanies(page = 1, pageSize = 20): Promise<PaginatedCompanies> {

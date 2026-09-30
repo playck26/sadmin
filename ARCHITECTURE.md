@@ -51,7 +51,7 @@ page.tsx (server component, fino)
 
 | Rota | Papel |
 |---|---|
-| `/login` | entrada (`super_admin`) |
+| `/login` | entrada (`super_admin`). **Dinâmica (`ƒ`) desde 2026-09-30**: lê `?motivo=` para explicar por que a sessão caiu |
 | `/empresas` (+ `nova`, `[id]`) | lista, criação e edição de tenants. **SPEC-016:** `[id]` traz o card `company-admins-card` — lista os gestores e gera senha temporária para quem perdeu o acesso, exibida **uma vez só** |
 
 ## 4. Estado
@@ -111,9 +111,19 @@ concentra três comportamentos:
    mesmo tempo disparariam três refreshes, e a rotação do backend trataria
    os concorrentes como reuso de token, **revogando a sessão inteira**;
 3. **desvia em `403 SENHA_TEMPORARIA`** para a tela de primeiro acesso
-   (só no `cliente`), em vez de mostrar erro seco.
+   (só no `cliente`), em vez de mostrar erro seco;
+4. **recusa token de outro perfil** (2026-09-30) antes de mandar o pedido:
+   lê o `role` do payload do JWT (`perfilDoToken`, em `lib/auth-storage.ts`) e,
+   se não for `super_admin`, limpa o token e leva a `/login?motivo=outro-perfil`.
+   **O cookie de refresh é um só para os três painéis** (mesmo host da API,
+   path `/api/v1/auth`): um login no painel do clube, no mesmo navegador, o
+   troca, e a renovação daqui passava a devolver token de gestor — a tela
+   mostrava "Forbidden" com zero empresas. O `login()` também recusa conta de
+   outro perfil. Token ilegível segue: a leitura não é verificação, quem
+   decide é o `SuperAdminGuard`. **A causa (cookie compartilhado) continua no
+   `back`**; aqui só se impede que ela vire tela quebrada.
 
-**Chamar `fetch` direto numa tela é violação de camada** — perde as três
+**Chamar `fetch` direto numa tela é violação de camada** — perde as quatro
 coisas acima.
 
 ## 6. Tipos do contrato
