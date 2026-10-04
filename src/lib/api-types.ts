@@ -228,6 +228,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/students/{id}/convite-de-acesso": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StudentsController_situacaoDoConvite"];
+        put?: never;
+        post: operations["StudentsController_enviarConvite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/students/{id}/aprovar": {
         parameters: {
             query?: never;
@@ -302,6 +318,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["TeachersController_gerarAcesso"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/teachers/{id}/convite-de-acesso": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TeachersController_situacaoDoConvite"];
+        put?: never;
+        post: operations["TeachersController_enviarConvite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -430,6 +462,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["ImportacaoController_importar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/ativacao/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AtivacaoPublicaController_consultar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/ativacao": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AtivacaoPublicaController_ativar"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2211,6 +2275,19 @@ export interface components {
             /** @example Xk4p-9Qm2 */
             senhaTemporaria: string;
         };
+        SituacaoDoConviteResponseDto: {
+            /**
+             * @example enviado
+             * @enum {string}
+             */
+            situacao: "ativado" | "sem_conta" | "nao_enviado" | "enviado" | "falhou" | "expirado";
+            /** Format: date-time */
+            em: string | null;
+            /** Format: date-time */
+            expiraEm: string | null;
+            /** @enum {string|null} */
+            motivo: "cota" | "recusado" | "indisponivel" | "tempo_esgotado" | "configuracao" | "sem_confirmacao" | null;
+        };
         CreateStudentDto: {
             nome: string;
             email: string;
@@ -2383,12 +2460,12 @@ export interface components {
             /** @example ana@clube.local */
             email: string;
             telefone: string | null;
-            /** Format: date-time */
-            dataNascimento: string | null;
-            emergenciaNome: string | null;
-            emergenciaTelefone: string | null;
             /** Format: uuid */
             nivelId: string | null;
+            /** Format: uuid */
+            turmaId: string | null;
+            /** @example Terça 19h */
+            turmaNome: string | null;
         };
         RelatorioDeImportacaoDto: {
             /**
@@ -2401,6 +2478,18 @@ export interface components {
             erros: components["schemas"]["ErroDeImportacaoDto"][];
             linhas: components["schemas"]["LinhaValidaDto"][];
         };
+        ConviteDaImportacaoDto: {
+            /**
+             * @example enviado
+             * @enum {string}
+             */
+            email: "enviado" | "falhou";
+            /**
+             * @example cota
+             * @enum {string}
+             */
+            motivo?: "cota" | "recusado" | "indisponivel" | "tempo_esgotado" | "configuracao";
+        };
         AlunoImportadoDto: {
             /** @example 2 */
             linha: number;
@@ -2409,13 +2498,28 @@ export interface components {
             /** @example ana@clube.local */
             email: string;
             /**
-             * @description Sai UMA VEZ. Nenhuma outra rota a devolve -- se o gestor perder, o caminho e regenerar.
-             * @example Kx7-mQ2p
+             * @description Sai UMA VEZ, so na linha NAO convidada. Nenhuma outra rota a devolve -- se o gestor perder, o caminho e regenerar.
+             * @example pck-ACDE34
              */
-            senhaTemporaria: string;
+            senhaTemporaria?: string;
+            /** @description So na linha convidada (campo `convidar`). */
+            convite?: components["schemas"]["ConviteDaImportacaoDto"];
         };
         ImportacaoConcluidaDto: {
             criados: components["schemas"]["AlunoImportadoDto"][];
+        };
+        EmpresaDaAtivacaoResponseDto: {
+            /** @example Smart Tennis */
+            nome: string;
+        };
+        AtivacaoPublicaResponseDto: {
+            /** @example Maria */
+            primeiroNome: string;
+            empresa: components["schemas"]["EmpresaDaAtivacaoResponseDto"];
+        };
+        AtivarContaDto: {
+            token: string;
+            senha: string;
         };
         PlanoResponseDto: {
             /** Format: uuid */
@@ -3660,6 +3764,17 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        ErroTransitorioResponseDto: {
+            /** @example 503 */
+            statusCode: number;
+            /**
+             * @description O código é o contrato; a mensagem é texto para humano e pode mudar sem aviso.
+             * @enum {string}
+             */
+            code: "SERVIDOR_OCUPADO";
+            /** @example O sistema está com muita procura agora. Tente de novo em alguns segundos. */
+            message: string;
+        };
         AulaDoAlunoResponseDto: {
             /** Format: uuid */
             ocupacaoId: string;
@@ -3746,10 +3861,10 @@ export interface components {
             /** @example 409 */
             statusCode: number;
             /**
-             * @description O código é o contrato; a mensagem é texto para humano e pode mudar sem aviso. Tela que decide pela mensagem quebra na primeira revisão de copy. `TURMA_CHEIA` vem também quando uma das próximas aulas já está lotada contando as reposições marcadas, e então a mensagem diz o dia.
+             * @description O código é o contrato; a mensagem é texto para humano e pode mudar sem aviso. Tela que decide pela mensagem quebra na primeira revisão de copy. `TURMA_CHEIA` vem também quando uma das próximas aulas já está lotada contando as reposições marcadas, e então a mensagem diz o dia. `MATRICULA_EM_ANDAMENTO` (SPEC-082): a matrícula esperou a vez por mais de 2 s — outra pessoa entrando na mesma turma, ou uma alteração em andamento na matrícula do aluno ou no clube; nada foi gravado, e a mensagem pede para tentar de novo.
              * @enum {string}
              */
-            code: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | "PRAZO_DE_CANCELAMENTO";
+            code: "ALUNO_NAO_APROVADO" | "TURMA_INATIVA" | "LIMITE_DE_TURMAS" | "TURMA_CHEIA" | "PRAZO_DE_CANCELAMENTO" | "MATRICULA_EM_ANDAMENTO";
             /** @example Esta turma já está com todas as vagas ocupadas. */
             message: string;
             /** @example 2 */
@@ -4747,6 +4862,48 @@ export interface operations {
             };
         };
     };
+    StudentsController_situacaoDoConvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SituacaoDoConviteResponseDto"];
+                };
+            };
+        };
+    };
+    StudentsController_enviarConvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SituacaoDoConviteResponseDto"];
+                };
+            };
+        };
+    };
     StudentsController_aprovar: {
         parameters: {
             query?: never;
@@ -4897,6 +5054,48 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProfessorComSenhaTemporariaResponseDto"];
+                };
+            };
+        };
+    };
+    TeachersController_situacaoDoConvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SituacaoDoConviteResponseDto"];
+                };
+            };
+        };
+    };
+    TeachersController_enviarConvite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SituacaoDoConviteResponseDto"];
                 };
             };
         };
@@ -5203,6 +5402,11 @@ export interface operations {
                 "multipart/form-data": {
                     /** Format: binary */
                     arquivo?: string;
+                    /**
+                     * @description Números de linha da planilha (contando o cabeçalho), separados por vírgula, que recebem convite por e-mail em vez de senha temporária. Um número que não é linha válida do arquivo responde 400 CONVIDAR_LINHA_INVALIDA, e nada é escrito. Ignorado com conferir=true.
+                     * @example 3,5,9
+                     */
+                    convidar?: string;
                 };
             };
         };
@@ -5214,6 +5418,48 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["RelatorioDeImportacaoDto"] | components["schemas"]["ImportacaoConcluidaDto"];
                 };
+            };
+        };
+    };
+    AtivacaoPublicaController_consultar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AtivacaoPublicaResponseDto"];
+                };
+            };
+        };
+    };
+    AtivacaoPublicaController_ativar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AtivarContaDto"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -7216,7 +7462,7 @@ export interface operations {
                     "application/json": components["schemas"]["MatriculaEmTurmaResponseDto"];
                 };
             };
-            /** @description Turma sem vaga de matrícula (capacidade), ou uma das próximas aulas já lotada contando as reposições marcadas (`AULA_LOTADA`): alocar deixaria esse dia acima da capacidade, e a mensagem diz o dia. */
+            /** @description Turma sem vaga de matrícula (capacidade; `TURMA_CHEIA` desde a SPEC-082/AC-009), ou uma das próximas aulas já lotada contando as reposições marcadas (`AULA_LOTADA`): alocar deixaria esse dia acima da capacidade, e a mensagem diz o dia. `MATRICULA_EM_ANDAMENTO` (SPEC-082): a alocação esperou a vez por mais de 2 s; nada foi gravado. */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -7229,6 +7475,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description SPEC-082 — o tempo-limite da matrícula estourou ou o servidor está sem conexão livre (`SERVIDOR_OCUPADO`). Nada foi gravado. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroTransitorioResponseDto"];
+                };
             };
         };
     };
@@ -7386,6 +7641,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description SPEC-082 — o tempo-limite da matrícula estourou ou o servidor está sem conexão livre (`SERVIDOR_OCUPADO`). Nada foi gravado. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroTransitorioResponseDto"];
+                };
             };
         };
     };
@@ -8259,12 +8523,21 @@ export interface operations {
                     "application/json": components["schemas"]["ConfirmacaoDaVezResponseDto"];
                 };
             };
-            /** @description A vez nao esta aberta (`NAO_E_SUA_VEZ`), o prazo venceu (`VEZ_EXPIRADA`) ou a confirmacao foi recusada pelo gesto de destino (`TURMA_SEM_VAGA`, `TURMA_CHEIA`, `SEM_CREDITO_DE_REPOSICAO`, `NIVEL_INCOMPATIVEL` (SPEC-075), `TETO_DE_REPOSICAO`, ...). **Em todos, a linha fica encerrada.** */
+            /** @description A vez nao esta aberta (`NAO_E_SUA_VEZ`), o prazo venceu (`VEZ_EXPIRADA`) ou a confirmacao foi recusada pelo gesto de destino (`TURMA_SEM_VAGA`, `TURMA_CHEIA`, `SEM_CREDITO_DE_REPOSICAO`, `NIVEL_INCOMPATIVEL` (SPEC-075), `TETO_DE_REPOSICAO`, ...). **Em todos, a linha fica encerrada.** Exceção (SPEC-082): `MATRICULA_EM_ANDAMENTO` — a confirmação esperou a vez por mais de 2 s; nada foi gravado e a linha continua chamada. */
             409: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description SPEC-082 — o tempo-limite estourou ou o servidor está sem conexão livre (`SERVIDOR_OCUPADO`). Nada foi gravado. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErroTransitorioResponseDto"];
+                };
             };
         };
     };
