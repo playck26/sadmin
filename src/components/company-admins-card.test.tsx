@@ -43,6 +43,19 @@ const SEGUNDA: AdminDaEmpresa = {
   senhaTemporaria: false,
 };
 
+const CAMPOS = ["Nome", "Email", "Senha", "Telefone (opcional)"] as const;
+
+/**
+ * Os quatro campos, um por um. Conferir só alguns deixou passar, na 1ª
+ * rodada da validação, limpar só a senha no erro e esquecer o e-mail no
+ * sucesso (M09, M10).
+ */
+function esperarCampos(valores: readonly [string, string, string, string]) {
+  CAMPOS.forEach((rotulo, i) => {
+    expect(screen.getByLabelText(rotulo)).toHaveValue(valores[i]);
+  });
+}
+
 function preencher(telefone = "") {
   fireEvent.change(screen.getByLabelText("Nome"), {
     target: { value: SEGUNDA.nome },
@@ -84,8 +97,7 @@ describe("CompanyAdminsCard — adicionar gestor (SPEC-085)", () => {
     expect(screen.getByRole("status")).toHaveTextContent(
       `${SEGUNDA.nome} foi adicionado`,
     );
-    expect(screen.getByLabelText("Nome")).toHaveValue("");
-    expect(screen.getByLabelText("Senha")).toHaveValue("");
+    esperarCampos(["", "", "", ""]);
     expect(fn.listCompanyAdmins).toHaveBeenCalledTimes(2);
   });
 
@@ -110,14 +122,13 @@ describe("CompanyAdminsCard — adicionar gestor (SPEC-085)", () => {
     render(<CompanyAdminsCard companyId="e1" />);
     await screen.findByText(INICIAL.nome);
 
-    preencher();
+    preencher("11999990000");
     fireEvent.click(screen.getByRole("button", { name: "Adicionar gestor" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Este e-mail já pertence a outra conta.",
     );
-    expect(screen.getByLabelText("Email")).toHaveValue(SEGUNDA.email);
-    expect(screen.getByLabelText("Nome")).toHaveValue(SEGUNDA.nome);
+    esperarCampos([SEGUNDA.nome, SEGUNDA.email, "senha-forte-1", "11999990000"]);
     expect(screen.queryByRole("status")).toBeNull();
   });
 
