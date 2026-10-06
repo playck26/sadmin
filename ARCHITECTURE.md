@@ -52,7 +52,7 @@ page.tsx (server component, fino)
 | Rota | Papel |
 |---|---|
 | `/login` | entrada (`super_admin`). **Dinâmica (`ƒ`) desde 2026-09-30**: lê `?motivo=` para explicar por que a sessão caiu |
-| `/empresas` (+ `nova`, `[id]`) | lista, criação e edição de tenants. **SPEC-016:** `[id]` traz o card `company-admins-card` — lista os gestores e gera senha temporária para quem perdeu o acesso, exibida **uma vez só** |
+| `/empresas` (+ `nova`, `[id]`) | lista, criação e edição de tenants. **SPEC-016:** `[id]` traz o card `company-admins-card` — lista os gestores e gera senha temporária para quem perdeu o acesso, exibida **uma vez só**. **SPEC-085:** o mesmo card tem o formulário "Adicionar gestor" (nome, e-mail, senha, telefone), que chama `POST /companies/:id/admins`; é o único teste do card (`company-admins-card.test.tsx`, 4 casos) |
 
 ## 4. Estado
 
