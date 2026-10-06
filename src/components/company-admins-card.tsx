@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   ApiError,
+  criarAdmin,
   gerarSenhaDeAdmin,
   listCompanyAdmins,
   type AdminDaEmpresa,
@@ -28,6 +31,13 @@ export function CompanyAdminsCard({ companyId }: { companyId: string }) {
   const [gerandoId, setGerandoId] = useState<string | null>(null);
   const [gerada, setGerada] = useState<SenhaTemporariaGerada | null>(null);
   const [copiado, setCopiado] = useState(false);
+  // SPEC-085 — o formulário do gestor adicional.
+  const [novoNome, setNovoNome] = useState("");
+  const [novoEmail, setNovoEmail] = useState("");
+  const [novaSenha, setNovaSenha] = useState("");
+  const [novoTelefone, setNovoTelefone] = useState("");
+  const [criando, setCriando] = useState(false);
+  const [criado, setCriado] = useState<string | null>(null);
 
   useEffect(() => {
     listCompanyAdmins(companyId)
@@ -58,6 +68,39 @@ export function CompanyAdminsCard({ companyId }: { companyId: string }) {
     }
   }
 
+  /**
+   * SPEC-085/AC-006 — no erro, o que foi digitado fica: um `409
+   * EMAIL_EM_USO` pede para trocar só o e-mail, não para redigitar tudo.
+   */
+  async function adicionar(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setErro(null);
+    setCriado(null);
+    setCriando(true);
+    try {
+      const gestor = await criarAdmin(companyId, {
+        nome: novoNome,
+        email: novoEmail,
+        senha: novaSenha,
+        telefone: novoTelefone.trim() === "" ? undefined : novoTelefone,
+      });
+      setNovoNome("");
+      setNovoEmail("");
+      setNovaSenha("");
+      setNovoTelefone("");
+      setCriado(gestor.nome);
+      setAdmins(await listCompanyAdmins(companyId));
+    } catch (e) {
+      setErro(
+        e instanceof ApiError
+          ? e.message
+          : "Não foi possível adicionar o gestor.",
+      );
+    } finally {
+      setCriando(false);
+    }
+  }
+
   async function copiar(senha: string) {
     try {
       await navigator.clipboard.writeText(senha);
@@ -85,6 +128,64 @@ export function CompanyAdminsCard({ companyId }: { companyId: string }) {
             {erro}
           </p>
         ) : null}
+
+        <form
+          onSubmit={(e) => void adicionar(e)}
+          className="flex flex-col gap-3 rounded-lg border border-border p-3"
+        >
+          <p className="text-sm font-medium">Adicionar gestor</p>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="novoGestorNome">Nome</Label>
+            <Input
+              id="novoGestorNome"
+              required
+              value={novoNome}
+              onChange={(e) => setNovoNome(e.target.value)}
+              disabled={criando}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="novoGestorEmail">Email</Label>
+            <Input
+              id="novoGestorEmail"
+              type="email"
+              required
+              value={novoEmail}
+              onChange={(e) => setNovoEmail(e.target.value)}
+              disabled={criando}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="novoGestorSenha">Senha</Label>
+            <Input
+              id="novoGestorSenha"
+              type="password"
+              required
+              minLength={8}
+              value={novaSenha}
+              onChange={(e) => setNovaSenha(e.target.value)}
+              disabled={criando}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="novoGestorTelefone">Telefone (opcional)</Label>
+            <Input
+              id="novoGestorTelefone"
+              value={novoTelefone}
+              onChange={(e) => setNovoTelefone(e.target.value)}
+              disabled={criando}
+            />
+          </div>
+          <Button type="submit" disabled={criando}>
+            {criando ? "Adicionando..." : "Adicionar gestor"}
+          </Button>
+          {criado ? (
+            <p role="status" className="text-sm">
+              {criado} foi adicionado. Entregue a senha por um canal que você
+              confie.
+            </p>
+          ) : null}
+        </form>
 
         {gerada ? (
           <div className="flex flex-col gap-2 rounded-lg border border-[var(--color-primary)] p-3">

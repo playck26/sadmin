@@ -284,6 +284,20 @@ export async function listCompanyAdmins(id: string): Promise<AdminDaEmpresa[]> {
   return (await res.json()) as AdminDaEmpresa[];
 }
 
+/** SPEC-085 — os mesmos campos do admin inicial do cadastro da empresa. */
+export type NovoGestor = components["schemas"]["AdminInicialDto"];
+
+export async function criarAdmin(
+  companyId: string,
+  dto: NovoGestor,
+): Promise<AdminDaEmpresa> {
+  const res = await authFetch(`/companies/${companyId}/admins`, {
+    method: "POST",
+    body: JSON.stringify(dto),
+  });
+  return (await res.json()) as AdminDaEmpresa;
+}
+
 export async function gerarSenhaDeAdmin(
   companyId: string,
   usuarioId: string,
