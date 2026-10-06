@@ -701,7 +701,7 @@ export interface paths {
         };
         get: operations["CompaniesController_listAdmins"];
         put?: never;
-        post?: never;
+        post: operations["CompaniesController_criarAdmin"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5861,6 +5861,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminDaEmpresaResponseDto"][];
+                };
+            };
+        };
+    };
+    CompaniesController_criarAdmin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminInicialDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminDaEmpresaResponseDto"];
                 };
             };
         };
