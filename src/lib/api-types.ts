@@ -36,6 +36,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/login/escolher": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_escolherEmpresa"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/refresh": {
         parameters: {
             query?: never;
@@ -2013,6 +2029,34 @@ export interface components {
             accessToken: string;
             refreshToken: string;
             usuario: components["schemas"]["UsuarioPublicoResponseDto"];
+        };
+        OpcaoDeEmpresaDto: {
+            /** Format: uuid */
+            usuarioId: string;
+            /** @example Smart Tennis */
+            empresaNome: string;
+            logoUrl: string | null;
+            /** @enum {string} */
+            papel: "super_admin" | "company_admin" | "aluno" | "professor";
+            /** @enum {string} */
+            situacao: "disponivel" | "senha_expirada";
+        };
+        EscolhaDeEmpresaDto: {
+            token: string;
+            empresas: components["schemas"]["OpcaoDeEmpresaDto"][];
+        };
+        EscolhaDeEmpresaRespostaDto: {
+            /** @example 409 */
+            statusCode: number;
+            /** @enum {string} */
+            code: "ESCOLHA_DE_EMPRESA";
+            message: string;
+            escolha: components["schemas"]["EscolhaDeEmpresaDto"];
+        };
+        EscolherEmpresaDto: {
+            token: string;
+            /** Format: uuid */
+            usuarioId: string;
         };
         AccessTokenResponseDto: {
             accessToken: string;
@@ -4525,6 +4569,37 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginResponseDto"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EscolhaDeEmpresaRespostaDto"];
+                };
+            };
+        };
+    };
+    AuthController_escolherEmpresa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EscolherEmpresaDto"];
             };
         };
         responses: {
