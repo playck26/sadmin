@@ -2544,6 +2544,14 @@ export interface components {
             /** @example Ja existe uma conta com este e-mail. */
             mensagem: string;
         };
+        TurmaDaLinhaDto: {
+            /** Format: uuid */
+            id: string;
+            /** @example Terça 19h */
+            nome: string;
+            /** @enum {string} */
+            coluna: "turma 1" | "turma 2" | "turma 3";
+        };
         LinhaValidaDto: {
             /** @example 2 */
             linha: number;
@@ -2554,10 +2562,7 @@ export interface components {
             telefone: string | null;
             /** Format: uuid */
             nivelId: string | null;
-            /** Format: uuid */
-            turmaId: string | null;
-            /** @example Terça 19h */
-            turmaNome: string | null;
+            turmas: components["schemas"]["TurmaDaLinhaDto"][];
         };
         RelatorioDeImportacaoDto: {
             /**
